@@ -1,0 +1,105 @@
+div.scrollmenu {
+    overflow: auto;
+    white-space: nowrap;
+}
+  
+div.scrollmenu a {
+display: inline-block;
+color: white;
+text-align: center;
+padding: 14px;
+text-decoration: none;
+}
+
+.main-sidebar{
+    height:250% !important;
+}
+
+.form_required{
+    color:red    
+}
+.error-text
+{
+    color:red
+}
+.loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    margin-left: 40%;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.file_clear{
+    position: absolute;
+    display:none;
+}
+.uploaded_file_clear{
+    position: absolute;
+}
+.uploaded_file_edit
+{
+    float: right;
+    width: 67%;
+    border: 1px solid #ffffff;
+}
+.content-scroll
+{
+    width: 200px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+.topright_first {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    font-size: 18px;
+    color:#c1bbbb;
+}
+.topright_second {
+    position: absolute;
+    top: 8px;
+    right: 31px;
+    font-size: 18px;
+    color:#c1bbbb;
+}
+.masters_count
+{
+    float: right;
+    border-radius: 45%;
+    width: 45px;
+    height: 28px;
+    background: #666;
+    border: 2px solid #666;
+    color: #fdfbfb;
+    text-align: center;
+    margin-top: 6%;
+}
+
+.masters_selected_count
+{
+    float: right;
+    border-radius: 45%;
+    width: 45px;
+    height: 28px;
+    background: #fff;
+    border: 2px solid #fff;
+    color: #095284;
+    text-align: center;
+    margin-top: 6%;
+}
