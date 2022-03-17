@@ -8,6 +8,7 @@ use DataTables;
 use Response;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Session;
+use Illuminate\Support\Facades\Crypt;
 
 
 class TableController extends Controller
@@ -119,9 +120,22 @@ class TableController extends Controller
                         return
                         (($data->status == 1) ? "Available" : "Reserved" );
                    })
-                    ->make(true);
+                   ->addColumn('action',function ($data){
+                    $b_url = \URL::to('/');
+                    return
+                    "<a href=".$b_url."/table-availability/".Crypt::encrypt($data->id)."/edit class='btn btn-xs btn-primary'><i class='fa fa-edit'></i></a>";
+                   
+                })
+                ->rawColumns(['status','action'])
+                ->make(true);
         }
         return view('admin.pages.table-availability');
 
+    }
+
+    public function tableAvailabilityEdit(Request $request){
+        $decrypted_id  = Crypt::decrypt($request->id);
+        $table_details  = Table::find($decrypted_id);
+        return view('admin.pages.table-availability-edit', compact(['table_details']));  
     }
 }

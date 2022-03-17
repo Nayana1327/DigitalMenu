@@ -22,5 +22,6 @@ use App\Http\Controllers\API\ApiController;
 
 Route::get('/category-list', [ApiController::class, 'listCategories']);
 Route::get('/menu-list', [ApiController::class, 'listMenus']);
+Route::get('/table-list', [ApiController::class, 'listTables']);
 
 

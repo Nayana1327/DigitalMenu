@@ -51,6 +51,7 @@
                                           <th>Name</th>
                                           <th>Description</th>
                                           <th>Category</th>
+                                          <th>Sub Category</th>
                                           <th>Cuisine</th>
                                           <th>Portion</th>
                                           <th>Price</th>
@@ -111,6 +112,7 @@
             {data: 'menu_name', name: 'menu_name'},
             {data: 'menu_description', name: 'menu_description'},
             {data: 'menu_category', name: 'menu_category'},
+            {data: 'sub_category', name: 'sub_category'},
             {data: 'menu_cuisine', name: 'menu_cuisine'},
             {data: 'menu_portion', name: 'menu_portion'},
             {data: 'menu_price', name: 'menu_price'},

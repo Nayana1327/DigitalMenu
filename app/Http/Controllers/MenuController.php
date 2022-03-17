@@ -41,11 +41,9 @@ class MenuController extends Controller
                         return
                         (($data->menu_status == 1)?
                                     "<button onclick=unactivateMenu(".$data->id.") class='btn btn-xs btn-success'><i class='fa fa-check'></i></button>"
-                                    // "<a href=".$b_url."/menu/".Crypt::encrypt($data->id)."/unactivate class='btn btn-xs btn-Success'><i class='fa fa-check'></a>"
                                     :
                                     "<button onclick=activateMenu(".$data->id.") class='btn btn-xs btn-warning'><i class='fa fa-times'></i></button>"
-                                    // "<a href=".$b_url."/menu/".Crypt::encrypt($data->id)."/activate class='btn btn-xs btn-Danger'><i class='fa fa-times'></a>"
-                                );
+                        );
                    })
                     ->addColumn('action',function ($data){
                         $b_url = \URL::to('/');
@@ -117,7 +115,8 @@ class MenuController extends Controller
             'menu_cuisine'     => 'required|string|max:255',
             'menu_portion'     => 'required|string|max:255',
             'menu_price'       => 'required|string|max:255',
-            'menu_file_name'   => 'required|image|mimes:jpeg,png,jpg,gif,svg'
+            'menu_file_name'   => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+            'sub_category'     => 'required|string|max:255'
         ];
         $this->validate($request, $rules);
         
@@ -144,6 +143,7 @@ class MenuController extends Controller
             'menu_image'       => $fileNameToStore,
             'menu_status'      => '1',
             'created_at'       => date('Y-m-d H:i:s'),
+            'sub_category'     => $request->sub_category,
         ];
         $is_inserted = Menu::insert($menu_details);
         if($is_inserted)
@@ -177,7 +177,8 @@ class MenuController extends Controller
                     'menu_cuisine'     => 'required|string|max:255',
                     'menu_portion'     => 'required|string|max:255',
                     'menu_price'       => 'required|string|max:255',
-                    'menu_file_name'   => 'required|image|mimes:jpeg,png,jpg,gif,svg'
+                    'menu_file_name'   => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+                    'sub_category'     => 'required|string|max:255'
                 ]);
 
         $this->validate($request, $rules);
@@ -212,6 +213,7 @@ class MenuController extends Controller
                                 'menu_portion'     => $request->menu_portion,
                                 'menu_price'       => $request->menu_price,
                                 'menu_image'       => $fileNameToStore,
+                                'sub_category'     => $request->sub_category,
                                 ]);
 
         if($is_updated){

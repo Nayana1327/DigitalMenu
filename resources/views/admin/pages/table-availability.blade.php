@@ -49,6 +49,7 @@
                                           <th>S. No.</th>
                                           <th>Table No.</th>
                                           <th>Status</th>
+                                          <th></th>
                                       </tr>
                                   </thead>
                               </table>
@@ -102,7 +103,7 @@
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'table_no', name: 'table_no'},
             {data: 'status', name: 'status'},
-            // {data: 'action', name: 'action', orderable: false, searchable: false},
+           {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
     });
   });

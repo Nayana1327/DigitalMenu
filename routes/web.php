@@ -74,6 +74,8 @@ Route::get('/table-add', [TableController::class, 'tableAddView'])->name('table-
 Route::post('/table-add', [TableController::class, 'tableAdd'])->name('table-insert');
 Route::post('/table-delete', [TableController::class, 'tableDelete'])->name('table-delete');
 Route::get('/table-availability', [TableController::class, 'tableAvailability'])->name('table-availability');
+Route::get('/table-availability/{id}/edit', [TableController::class, 'tableAvailabilityEdit'])->name('tableAvailability-edit');
+Route::post('/table-availability/{id}/edit', [TableController::class, 'tableAvailabilityUpdate'])->name('tableAvailability-update');
 
 //Orders
 Route::get('/order-list', [OrderController::class, 'orderList'])->name('order-list');

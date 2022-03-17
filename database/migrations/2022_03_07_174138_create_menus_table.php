@@ -20,7 +20,7 @@ class CreateMenusTable extends Migration
             $table->string('menu_category');
             $table->string('menu_cuisine');
             $table->string('menu_portion');
-            $table->integer('menu_price');
+            $table->decimal('menu_price');
             $table->string('menu_image');
             $table->integer('menu_status');
             $table->timestamps();

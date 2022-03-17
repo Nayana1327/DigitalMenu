@@ -89,6 +89,23 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label>Subcategory</label><span class="form_required">*</span>
+                                            <select class="form-control select2"  name="sub_category" id="sub_category">
+                                                <option selected disabled>Select Subcategory</option>
+                                                <option value="Veg">Veg</option>
+                                                <option value="Non-Veg">Non-Veg</option>  
+                                            </select>
+                                            @if ($errors->has('sub_category'))
+                                            <span class="help-block">
+                                                <strong class="error-text">{{ $errors->first('sub_category') }}</strong>
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <div class="col-md-6">
+                                        <div class="form-group">
                                             <label>Cuisine</label><span class="form_required">*</span>
                                             <select class="form-control select2"  name="menu_cuisine" id="menu_cuisine">
                                                 <option selected disabled>Select Cuisine</option>
@@ -103,8 +120,6 @@
                                             @endif
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Portion</label><span class="form_required">*</span>
@@ -121,6 +136,8 @@
                                             @endif
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Price</label><span class="form_required">*</span>
@@ -132,8 +149,6 @@
                                             @endif
                                         </div>  
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Image</label>
@@ -225,9 +240,11 @@
                     maxlength: 255,
                 },
                 menu_file_name: {
-                    required: false
+                    required: true
                 },
-                
+                sub_category: {
+                    required: true
+                },
             },
             errorElement: 'span',
             errorPlacement: function (error, element) {
