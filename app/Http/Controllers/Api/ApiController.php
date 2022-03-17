@@ -16,7 +16,8 @@ use App\Http\Resources\Table as TableResource;
 class ApiController extends BaseController
 {
     public function listCategories(){
-       $categories = Category::all();
+       $categories = Category::select('category_name')
+                     ->get();
        return $this->sendResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
 
     } 
