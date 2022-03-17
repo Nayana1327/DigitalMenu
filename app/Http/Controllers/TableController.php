@@ -138,4 +138,30 @@ class TableController extends Controller
         $table_details  = Table::find($decrypted_id);
         return view('admin.pages.table-availability-edit', compact(['table_details']));  
     }
+
+    public function tableAvailabilityUpdate(Request $request){
+        $table_details = Table::find($request->id);
+        $rules = ([
+                    'table_no'        => 'required|string|max:255',
+                    'status' => 'required|string|max:255',
+                ]);
+
+        $this->validate($request, $rules);
+        $is_updated = Table::where('id', $request->id)
+                            ->update([
+                                'table_no'  => $request->table_no,
+                                'status'    => $request->status,
+                                ]);
+
+        if($is_updated){
+            $request->session()->flash('message', 'Table availability successfully!'); 
+        } else{
+            $request->session()->flash('message', ' failed!'); 
+        }
+        $request->session()->flash('alert-class', 'alert-success'); 
+        return redirect(route('table-availability'));
+        
+    }
+
+
 }

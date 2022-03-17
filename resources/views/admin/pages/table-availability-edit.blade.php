@@ -46,22 +46,26 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Name</label><span class="form_required">*</span>
-                                            <input type="text" name="menu_name" id="menu_name" value="{{ $menu_details->menu_name }}" class="form-control" placeholder="Enter Item Name"  reqiured="" autocomplete="off">
-                                            @if ($errors->has('menu_name'))
+                                            <label>Table No.</label><span class="form_required">*</span>
+                                            <input type="text" name="table_no" id="table_no" value="{{ $table_details->table_no }}" class="form-control" placeholder="Enter Table No."  reqiured="" autocomplete="off">
+                                            @if ($errors->has('table_no'))
                                             <span class="help-block">
-                                                <strong class="error-text">{{ $errors->first('menu_name') }}</strong>
+                                                <strong class="error-text">{{ $errors->first('table_no') }}</strong>
                                             </span>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Name</label><span class="form_required">*</span>
-                                            <input type="text" name="menu_name" id="menu_name" value="{{ $menu_details->menu_name }}" class="form-control" placeholder="Enter Item Name"  reqiured="" autocomplete="off">
-                                            @if ($errors->has('menu_name'))
+                                            <label>Availability Status</label><span class="form_required">*</span>
+                                            <select class="form-control select2"  name="status" id="status">
+                                                <option selected disabled>Select Availability Status</option>
+                                                <option {{ ($table_details->status) == '1' ? 'selected' : '' }}  value="1">Available</option>
+                                                <option {{ ($table_details->status) == '0' ? 'selected' : '' }}  value="0">Reserved</option>
+                                            </select>
+                                            @if ($errors->has('status'))
                                             <span class="help-block">
-                                                <strong class="error-text">{{ $errors->first('menu_name') }}</strong>
+                                                <strong class="error-text">{{ $errors->first('status') }}</strong>
                                             </span>
                                             @endif
                                         </div>
@@ -99,38 +103,14 @@
     $(function () {
        $('#table_edit').validate({
             rules: {
-                menu_name: {
+                table_no: {
                     required: true,
                     maxlength: 255,
                 },
-                menu_description: {
+                status: {
                     required: true,
                     maxlength: 255,
-                },
-                menu_category: {
-                    required: true,
-                    maxlength: 255,
-                },
-                sub_category: {
-                    required: true,
-                    maxlength: 255,
-                },
-                menu_cuisine: {
-                    required: true,
-                    maxlength: 255,
-                },
-                menu_portion: {
-                    required: true,
-                    maxlength: 255,
-                },
-                menu_price: {
-                    required: true,
-                    maxlength: 255,
-                },
-                menu_file_name: {
-                    required: false
-                },
-                
+                }
             },
             errorElement: 'span',
             errorPlacement: function (error, element) {

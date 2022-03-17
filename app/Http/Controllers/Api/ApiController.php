@@ -22,7 +22,9 @@ class ApiController extends BaseController
     } 
 
     public function listMenus(){
-        $menus = Menu::all();
+        $menus = Menu::where('menu_status', 1)
+                 ->select('menu_name','menu_description','menu_category','menu_cuisine','menu_portion','menu_price','menu_image','sub_category')
+                 ->get();
         return $this->sendResponse(MenuResource::collection($menus), 'Menus retrieved successfully.');
 
     }
@@ -34,6 +36,21 @@ class ApiController extends BaseController
         return $this->sendResponse(TableResource::collection($tables), 'Tables retrieved successfully.');
 
     }
+    // public function searchByMenu(Request $request){
+        
+    // }
+
+    // $search = "Har";
+  
+    //     $users = User::select("*")
+    //                     ->where('first_name', 'LIKE', '%'.$search.'%')
+    //                     ->orWhere('last_name', 'LIKE', '%'.$search.'%')
+    //                     ->orWhere('email', 'LIKE', '%'.$search.'%')
+    //                     ->get();
+  
+    //     dd($users);
+
+
 
 
 }

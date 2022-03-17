@@ -156,7 +156,7 @@
                                             <input type="file" name="menu_file_name" id="menu_file_name" class="form-control" placeholder="Choose Image" accept="image/png, image/jpeg, image/jpg" autocomplete="off">
                                             
                                             @if($menu_details->menu_image)
-                                                    <img width="150" height="100" class='image_uploaded_image' src="{{ url('storage/menu_item_images/' . $menu_details->menu_image) }}" />
+                                                    <img width="150" height="100" class='image_uploaded_image' src="{{ url('storage/public/menu_item_images/'.$menu_details->menu_image) }}" />
                                                     <img width="150" height="100" class='image_selected_image' style='display:none;' src="#"  />
                                                     @else
                                                     <p class='image_no_image'>No image found</p>

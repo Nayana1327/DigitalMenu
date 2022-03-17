@@ -33,7 +33,7 @@ class MenuController extends Controller
             return DataTables::of($data)
                     ->addIndexColumn()
                     ->addColumn('menu_image', function ($data){ 
-                        $url=asset("public/menu_item_images/$data->menu_image"); 
+                        $url=asset("storage/public/menu_item_images/$data->menu_image"); 
                         return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />'; 
                     })
                     ->addColumn('menu_status',function ($data){
@@ -119,7 +119,7 @@ class MenuController extends Controller
             'sub_category'     => 'required|string|max:255'
         ];
         $this->validate($request, $rules);
-        
+        $time = time();
         //1.get file name wth ext.
         $fileNameWithExt = $request->file('menu_file_name')->getClientOriginalName();
         //2.get just file name
@@ -127,10 +127,12 @@ class MenuController extends Controller
         //1.get just ext.
         $extension = $request->file('menu_file_name')->getClientOriginalExtension();
         //4.file name to store
-        $fileNameToStore = $fileName.'_'.time().'.'.$extension;
+        $fileNameToStore = $time.'.'.$extension;
 
         //upload image
         $path = $request->file('menu_file_name')->storeAs('public/menu_item_images', $fileNameToStore);
+
+        // $imageName = 'public/menu_item_images/'.$request->menu_name.'_'.time().'.'.$extension.'';
         
 
         $menu_details = [
@@ -177,11 +179,12 @@ class MenuController extends Controller
                     'menu_cuisine'     => 'required|string|max:255',
                     'menu_portion'     => 'required|string|max:255',
                     'menu_price'       => 'required|string|max:255',
-                    'menu_file_name'   => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+                    'menu_file_name'   => 'image|mimes:jpeg,png,jpg,gif,svg',
                     'sub_category'     => 'required|string|max:255'
                 ]);
 
         $this->validate($request, $rules);
+        $time = time();
 
         if($request->hasFile('menu_file_name')){
             //1.get file name wth ext.
@@ -191,16 +194,15 @@ class MenuController extends Controller
             //1.get just ext.
             $extension = $request->file('menu_file_name')->getClientOriginalExtension();
             //4.file name to store
-            $fileNameToStore = $fileName.'_'.time().'.'.$extension;
+            $fileNameToStore = $time.'.'.$extension;
 
             //upload image
             $path = $request->file('menu_file_name')->storeAs('public/menu_item_images', $fileNameToStore);
 
-            if($menu_details->menu_image != 'noImage.png'){
-                Storage::delete('public/menu_item_images/'.$menu_details->menu_image);
-            }
-            
+            // $imageName = 'public/menu_item_images/'.$request->menu_name.'_'.time().'.'.$extension.'';
             $menu_details->menu_image = $fileNameToStore;
+        }else{
+            unset($request->menu_file_name);
         }
 
 
