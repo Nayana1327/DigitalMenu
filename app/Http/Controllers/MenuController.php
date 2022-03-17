@@ -33,7 +33,7 @@ class MenuController extends Controller
             return DataTables::of($data)
                     ->addIndexColumn()
                     ->addColumn('menu_image', function ($data){ 
-                        $url=asset("storage/menu_item_images/$data->menu_image"); 
+                        $url=asset("public/menu_item_images/$data->menu_image"); 
                         return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />'; 
                     })
                     ->addColumn('menu_status',function ($data){
