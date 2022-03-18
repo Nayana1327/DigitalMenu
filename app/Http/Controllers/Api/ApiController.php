@@ -40,7 +40,7 @@ class ApiController extends BaseController
     //Available Table Listing Api
     public function listTables(){
         $tables = Table::where('status', 1)
-                  ->select('id as tableId','table_name as tableQRData','table_no as tableNo.')
+                  ->select('id as tableId','table_name as tableQRData','table_no as tableNo')
                   ->get();
         if($tables){
             return $this->sendResponse(TableResource::collection($tables), 'Tables retrieved successfully.');
@@ -87,19 +87,40 @@ class ApiController extends BaseController
         $subCategory = $request->subCategoryName;
         $searchValue = $request->searchValue;
         $menus = Menu::select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
-                       ->where(function($query) use ($categoryName, $subCategory, $searchValue) {
-                            $query->where('menu_category', 'like', '%' .$categoryName. '%')
-                            ->orWhere('sub_category', $subCategory)
-                            ->orWhere('menu_name', 'like', '%'.$searchValue.'%');
-                       })
-                    //    ->where('menu_category', $categoryName)
-                    //    ->orWhere('sub_category', $subCategory)
-                    //    ->orWhere('menu_name', 'like', '%'.$searchValue.'%')
+                    // ->when($categoryName, function ($query, $categoryName){
+                    //     $query->where('menu_category', 'like', '%'.$categoryName.'%');  
+                    // })
+                    // ->when($subCategory, function ($query, $subCategory){
+                    //     $query->where('sub_category', $subCategory);
+                    // })
+                    // ->when($searchValue, function ($query, $searchValue){
+                    //     $query->where('menu_name', 'like', '%'.$searchValue.'%');
+                    // })
+                    // ->where('menu_status', 1)
+                    // ->get();
+        
+                    // //    ->where(function($query) use ($categoryName, $subCategory, $searchValue) {
+                    // //         $query->where('menu_category', 'like', '%' .$categoryName. '%')
+                    // //         ->orWhere('sub_category', $subCategory)
+                    // //         ->orWhere('menu_name', 'like', '%'.$searchValue.'%');
+                    // //    })
+                       ->where('menu_category', $categoryName)
+                       ->orWhere('sub_category', $subCategory)
+                       ->orWhere('menu_name', 'like', '%'.$searchValue.'%')
                        ->where('menu_status', 1)
                        ->get();
      return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
     
     }
+
+    // Model::select(‘id’,’name’)->when($a,function ($query,$a)  {
+    //     $query->where('a', '=', $a);
+              
+    // })
+    // >when($b,function ($query,$b)  {
+    //     $query->where('b', '=', $b);
+              
+    // })
 
 
     
