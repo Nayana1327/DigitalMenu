@@ -87,15 +87,15 @@ class ApiController extends BaseController
         $subCategory = $request->subCategory;
         $searchValue = $request->searchValue;
         $menus = Menu::select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
-                        ->where(function($query) use ($categoryName, $subCategory) {
+                      ->where('menu_status', 1) 
+                      ->where(function($query) use ($categoryName, $subCategory) {
                             $query->where('menu_category', 'like', '%' .$categoryName. '%')
-                            ->Where('sub_category', $subCategory);
+                            ->orWhere('sub_category', $subCategory);
                         })
                         ->where(function($query) use ($searchValue) {
                         $query->where('menu_name', 'like', '%'.$searchValue.'%')
                               ->orWhere('menu_description','like', '%'.$searchValue.'%');
                         })
-                       ->where('menu_status', 1)
                        ->get();
         if($menus){
             return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
