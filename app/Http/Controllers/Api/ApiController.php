@@ -84,43 +84,29 @@ class ApiController extends BaseController
     }
     public function searchByMenu(Request $request){
         $categoryName = $request->categoryName;
-        $subCategory = $request->subCategoryName;
+        $subCategory = $request->subCategory;
         $searchValue = $request->searchValue;
         $menus = Menu::select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
-                    // ->when($categoryName, function ($query, $categoryName){
-                    //     $query->where('menu_category', 'like', '%'.$categoryName.'%');  
-                    // })
-                    // ->when($subCategory, function ($query, $subCategory){
-                    //     $query->where('sub_category', $subCategory);
-                    // })
-                    // ->when($searchValue, function ($query, $searchValue){
-                    //     $query->where('menu_name', 'like', '%'.$searchValue.'%');
-                    // })
-                    // ->where('menu_status', 1)
-                    // ->get();
-        
-                    // //    ->where(function($query) use ($categoryName, $subCategory, $searchValue) {
-                    // //         $query->where('menu_category', 'like', '%' .$categoryName. '%')
-                    // //         ->orWhere('sub_category', $subCategory)
-                    // //         ->orWhere('menu_name', 'like', '%'.$searchValue.'%');
-                    // //    })
-                       ->where('menu_category', $categoryName)
-                       ->orWhere('sub_category', $subCategory)
-                       ->orWhere('menu_name', 'like', '%'.$searchValue.'%')
+                        ->where(function($query) use ($categoryName, $subCategory) {
+                            $query->where('menu_category', 'like', '%' .$categoryName. '%')
+                            ->Where('sub_category', $subCategory);
+                        })
+                        ->where(function($query) use ($searchValue) {
+                        $query->where('menu_name', 'like', '%'.$searchValue.'%')
+                              ->orWhere('menu_description','like', '%'.$searchValue.'%');
+                        })
                        ->where('menu_status', 1)
                        ->get();
-     return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
+        if($menus){
+            return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
+        }  
+        else{
+        return $this->sendError('Menu not found', $code = 404);
+        }
     
     }
 
-    // Model::select(‘id’,’name’)->when($a,function ($query,$a)  {
-    //     $query->where('a', '=', $a);
-              
-    // })
-    // >when($b,function ($query,$b)  {
-    //     $query->where('b', '=', $b);
-              
-    // })
+   
 
 
     
