@@ -61,9 +61,6 @@ class TableController extends Controller
         ];
         $this->validate($request, $rules);
         $time = time();
-        $qrImage = QrCode::size(500)
-                   ->generate($request->table_data, 'public/qr_images/'.$time.'.svg');
-        $imgName = 
         $img_url = 'public/qr_images/'.$time.'.svg';
 
         $table_details = [
@@ -73,7 +70,12 @@ class TableController extends Controller
             'status'     => '1',
             'created_at' => date('Y-m-d H:i:s'),
         ];
-        $is_inserted = Table::insert($table_details);
+        $is_inserted = Table::create($table_details);
+        
+        $table_id = $is_inserted->id;
+        $qrImage = QrCode::size(500)
+                   ->generate($table_id, 'public/qr_images/'.$time.'.svg');
+        
         if($is_inserted)
         {
             $request->session()->flash('message', 'Table QR data created successfully!'); 

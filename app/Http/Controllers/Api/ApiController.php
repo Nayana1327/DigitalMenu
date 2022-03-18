@@ -24,7 +24,7 @@ class ApiController extends BaseController
             return $this->sendResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
         }
         else{
-            return $this->sendError('Categories not found', $code = 404);  
+            return $this->sendError('Categories not found');  
         }
     } 
     
@@ -46,7 +46,7 @@ class ApiController extends BaseController
             return $this->sendResponse(TableResource::collection($tables), 'Tables retrieved successfully.');
         }
         else{
-                return $this->sendError('Tables not found', $code = 404);  
+                return $this->sendError('Tables not found');  
         }
     }
 
@@ -73,12 +73,12 @@ class ApiController extends BaseController
                     return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');
                 }
                 else{
-                    return $this->sendError('No data found', $code = 404);
+                    return $this->sendError('No data found');
                 }
             } 
         }
         else{
-            return $this->sendError('Table reserved already', $code = 404);
+            return $this->sendError('Table reserved already');
         }
        
     }
@@ -101,7 +101,7 @@ class ApiController extends BaseController
             return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
         }  
         else{
-        return $this->sendError('Menu not found', $code = 404);
+        return $this->sendError('Menu not found');
         }
     
     }
