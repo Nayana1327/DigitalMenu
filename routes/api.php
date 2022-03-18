@@ -23,5 +23,6 @@ use App\Http\Controllers\Api\ApiController;
 Route::get('/category-list', [ApiController::class, 'listCategories']);
 Route::get('/menu-list', [ApiController::class, 'listMenus']);
 Route::get('/table-list', [ApiController::class, 'listTables']);
+Route::post('/search-menu', [ApiController::class, 'searchByMenu']);
 
 

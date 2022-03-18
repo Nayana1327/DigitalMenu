@@ -16,7 +16,7 @@ use App\Http\Resources\Table as TableResource;
 class ApiController extends BaseController
 {
     public function listCategories(){
-       $categories = Category::select('category_name')
+       $categories = Category::select('id as categoryId','category_name as categoryName')
                      ->get();
        return $this->sendResponse(CategoryResource::collection($categories), 'Categories retrieved successfully.');
 
@@ -24,7 +24,7 @@ class ApiController extends BaseController
 
     public function listMenus(){
         $menus = Menu::where('menu_status', 1)
-                 ->select('menu_name','menu_description','menu_category','menu_cuisine','menu_portion','menu_price','menu_image','sub_category')
+                 ->select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
                  ->get();
         return $this->sendResponse(MenuResource::collection($menus), 'Menus retrieved successfully.');
 
@@ -32,24 +32,26 @@ class ApiController extends BaseController
 
     public function listTables(){
         $tables = Table::where('status', 1)
-                  ->select('table_name','table_no')
+                  ->select('id as tableId','table_name as tableQRData','table_no as tableNo.')
                   ->get();
         return $this->sendResponse(TableResource::collection($tables), 'Tables retrieved successfully.');
 
     }
-    // public function searchByMenu(Request $request){
+    public function searchByMenu(Request $request){
+        $request->categoryName = 'Lunch';
+        $menus = Menu::where('menu_category', $request->categoryName)
+                       ->orWhere('sub_category', $request->subCategory)
+                       ->orWhere('menu_name', 'LIKE', '%'.$request->search.'%')
+                       ->select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
+                       ->get();
         
-    // }
+        return $this->sendResponse(MenuResource::collection($menus), 'Menu Item retrieved successfully.');
+        
+    }
 
-    // $search = "Har";
-  
-    //     $users = User::select("*")
-    //                     ->where('first_name', 'LIKE', '%'.$search.'%')
-    //                     ->orWhere('last_name', 'LIKE', '%'.$search.'%')
-    //                     ->orWhere('email', 'LIKE', '%'.$search.'%')
-    //                     ->get();
-  
-    //     dd($users);
+
+
+    
 
 
 

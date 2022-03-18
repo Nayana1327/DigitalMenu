@@ -51,7 +51,7 @@ class MenuController extends Controller
                         "<a href=".$b_url."/menu/".Crypt::encrypt($data->id)."/edit class='btn btn-xs btn-primary'><i class='fa fa-edit'></i></a>
                         <button onclick=deleteMenu(".$data->id.") class='btn btn-xs btn-danger'><i class='fa fa-trash'></i></button>";
                     })
-                    ->rawColumns(['menu_image','menu_status','action'])
+                    ->rawColumns(['sub_category','menu_image','menu_status','action'])
                     ->make(true);
         }
         return view('admin.pages.menu-list');
