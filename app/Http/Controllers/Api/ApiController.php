@@ -260,7 +260,7 @@ class ApiController extends BaseController
                  'menuDescription' => $order_value['menuDescription'],
                  'menuPrice'  => $order_value['menuPrice'],
                  'quantity'   => $order_value['quantity'],
-                 'order_price' =>  $order_value['menuPrice'] * $order_value['quantity'],
+                 'orderPrice' =>  $order_value['menuPrice'] * $order_value['quantity'],
             );
         array_push($order_array , $data);
         }
@@ -285,6 +285,9 @@ class ApiController extends BaseController
             ], $this->code);
     }
 
+    public function updateOrders(Request $request){
+
+    }
 
 
 
