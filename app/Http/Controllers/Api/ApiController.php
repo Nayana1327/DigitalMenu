@@ -26,12 +26,12 @@ class ApiController extends BaseController
         $this->success  = true;
         $this->message  = '';
     }
-   
+
     //Category Listing Api
     public function listCategories(){
        $categories = Category::select('id as categoryId','category_name as categoryName')
                      ->get();
-        
+
         if($categories){
             $this->data = $categories;
             //return success response
@@ -47,14 +47,14 @@ class ApiController extends BaseController
             'message'   => 'Something went wrong',
             'data'      => $this->data
         ], $this->code);
-    } 
-    
+    }
+
     //Menu Listing Api
     public function listMenus(){
         $menus = Menu::where('menu_status', 1)
                  ->select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
                  ->get();
-        
+
         if($menus){
             $this->data = $menus;
             //return success response
@@ -77,7 +77,7 @@ class ApiController extends BaseController
         $tables = Table::where('status', 1)
                   ->select('id as tableId','table_no as tableNo')
                   ->get();
-        
+
         if($tables){
             $this->data = $tables;
             //return success response
@@ -93,7 +93,7 @@ class ApiController extends BaseController
             'message'   => 'Something went wrong',
             'data'      => $this->data
         ], $this->code);
-    } 
+    }
 
 
     //Table Selection Api
@@ -103,7 +103,7 @@ class ApiController extends BaseController
             'tableId'      => 'required'
         ]);
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Validation Error.', $validator->errors());
         }
         //check if table already reserved
         $check = Table::where('id', $request->tableId)->first();
@@ -111,22 +111,22 @@ class ApiController extends BaseController
             if($check)
             {
                 $is_table_update = $check->update([
-                        'status'     => 0, 
+                        'status'     => 0,
                         'updated_at' => date('Y-m-d H:i:s'),
                      ]);
-            
+
                 if($is_table_update){
                     return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');
                 }
                 else{
                     return $this->sendError('No data found');
                 }
-            } 
+            }
         }
         else{
             return $this->sendError('Table reserved already');
         }
-       
+
     }
 
     //Menu Listing Api By (CategoryName, Veg/Non-Veg, Search)
@@ -135,7 +135,7 @@ class ApiController extends BaseController
         $subCategory = $request->subCategory;
         $searchValue = $request->searchValue;
         $menus = Menu::select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
-                      ->where('menu_status', 1) 
+                      ->where('menu_status', 1)
                       ->where(function($query) use ($categoryName) {
                             $query->where('menu_category', 'like', '%' .$categoryName. '%')
                             ->orWhere('menu_description', 'like', '%' .$categoryName. '%');
@@ -172,8 +172,8 @@ class ApiController extends BaseController
         //Validate data
         $data       = $request->only('tableId','menuId','quantity');
         $validator  = Validator::make($data, [
-            'tableId'   => 'required',
-            'menuId'    => 'required',
+            'tableId'   => 'required|exists:tables,id',
+            'menuId'    => 'required|exists:menus,id',
             'quantity'  => 'required',
         ]);
 
@@ -183,7 +183,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => $validator->messages(),
-                'data'      => $this->data
+                // 'data'      => $this->data
             ], $this->code);
         }
         $tableNo = Table::where('id', $request->tableId)->first();
@@ -198,7 +198,7 @@ class ApiController extends BaseController
         ];
         $is_order_created = UserOrder::create($order_details);
         $orderId = $is_order_created->id;
-        
+
         if (count($request->menuId) > 0) {
             foreach($request->menuId as $item=>$v) {
                 $data = array(
@@ -213,8 +213,8 @@ class ApiController extends BaseController
             $is_item_inserted = ItemOrdered::insert($data);
             }
         }
-        
-        if($is_order_created && $is_item_inserted)  
+
+        if($is_order_created && $is_item_inserted)
         {
             $this->data = $is_order_created && $is_item_inserted;
             //order created, return success response
@@ -235,19 +235,19 @@ class ApiController extends BaseController
     public function getUserOrder(Request $request){
         $data       = $request->only('tableId');
         $validator  = Validator::make($data, [
-            'tableId'      => 'required'
+            'tableId'      => 'required|exists:tables,id'
         ]);
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Validation Error.', $validator->errors());
         }
-        
+
         $tableOrder = ItemOrdered::where('item_ordereds.table_no', $request->tableId)
                       ->join('tables as t', 'item_ordereds.table_no', '=' , 't.id')
                       ->join('menus as m', 'item_ordereds.menu_id', '=' , 'm.id')
                       ->select('item_ordereds.table_no as tableId','t.table_no as tableNo','m.id as menuId','m.menu_name as menuName','m.menu_description as menuDescription','m.menu_price as menuPrice', 'item_ordereds.quantity as quantity')
                       ->get()
                       ->toArray();
-        
+
         $order_array=array();
     if(count($tableOrder) > 0){
         $sum = 0;
@@ -287,14 +287,14 @@ class ApiController extends BaseController
 
 
 
-   
-
-
-    
 
 
 
-    
+
+
+
+
+
 
 
 
