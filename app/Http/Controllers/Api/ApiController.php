@@ -17,7 +17,7 @@ class ApiController extends BaseController
     public function __construct()
     {
         // $this->user     = JWTAuth::parseToken()->authenticate();
-        // $this->data     = [];
+        $this->data     = [];
         $this->code     = Response::HTTP_OK;
         $this->success  = true;
         $this->message  = '';
@@ -40,7 +40,8 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'No Category Found'
+            'message'   => 'No Category Found',
+            'data'      => $this->data
         ], $this->code);
     }
 
@@ -62,7 +63,8 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'No Menu Found'
+            'message'   => 'No Menu Found',
+            'data'      => $this->data
         ], $this->code);
     }
 
@@ -84,7 +86,8 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'No Table Found'
+            'message'   => 'No Table Available',
+            'data'      => $this->data
         ], $this->code);
     }
 
@@ -147,6 +150,7 @@ class ApiController extends BaseController
         return response()->json([
         'success'   => $this->success,
         'message'   => 'No search found',
+        'data'      => $this->data
         ], $this->code);
     }
 
@@ -165,6 +169,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => $validator->messages(),
+                'data'      => $this->data
             ], $this->code);
         }
 
@@ -175,6 +180,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "Table order already exist. Please update.",
+                'data'      => $this->data
             ], $this->code);
         }
 
@@ -233,6 +239,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => $validator->messages(),
+                'data'      => $this->data
             ], $this->code);
         }
 
@@ -259,5 +266,110 @@ class ApiController extends BaseController
             'message'   => 'Order fetched successfully',
             'data'      => $this->data
             ], $this->code);
+    }
+
+    public function updateOrder(Request $request){
+        $data   = $request->only('orderId','menuId','quantity');
+
+        $validator  = Validator::make($data, [
+            'orderId'   => 'required|exists:orders,id',
+            'menuId'    => 'required|exists:menus,id',
+            'quantity'  => 'required',
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
+
+        foreach($request->menuId as $key => $value){
+            $menu_price = 0;
+            $order_details = [];
+
+            $menu_price = Menu::find($value);
+
+            $existingMenu = OrderDetails::where([
+                                                    'order_id' => $request->orderId,
+                                                    'menu_id' => $value
+                                                ])
+                                            ->first();
+            
+            if($existingMenu){
+                OrderDetails::where('id', $existingMenu->id)
+                                ->update([
+                                            'quantity' => $request->quantity[$key],
+                                            'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
+                                        ]);
+            }else{
+                $order_details = [
+                    'order_id'  => $request->orderId,
+                    'menu_id'   => $value,
+                    'quantity'  => $request->quantity[$key],
+                    'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
+                ];
+
+                OrderDetails::create($order_details);
+            }
+        }
+
+        $order_total_amount = OrderDetails::where('order_id', $request->orderId)->sum('menu_total_amount');
+
+        Orders::where('id', $request->orderId)->update(['order_total_amount' => $order_total_amount]);
+
+        //order updated, return success response
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => 'Order updated successfully',
+            'data'      => $this->data
+        ], $this->code);
+    }
+
+    public function deleteOrder(Request $request){
+        $data   = $request->only('orderId');
+
+        $validator  = Validator::make($data, [
+            'orderId'   => 'required|exists:orders,id'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
+
+        $deleteOrder = Orders::find($request->orderId);
+        if($deleteOrder){
+            $table_id   = $deleteOrder->table_id;
+            $deleteOrder->update(['order_status' => 'Order Cancelled']);
+            $deleteOrder->delete();
+            
+            Table::where('id', $table_id)
+                    ->update([
+                                'status'     => 1,
+                                'updated_at' => date('Y-m-d H:i:s')
+                            ]);
+    
+            //order deleted, return success response
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Order cancelled successfully',
+                'data'      => $this->data
+            ], $this->code);            
+        }
+        $this->success  = false;
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => "No order found",
+            'data'      => $this->data
+        ], $this->code);
     }
 }
