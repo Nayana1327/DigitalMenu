@@ -19,7 +19,6 @@ use App\Http\Controllers\Api\ApiController;
 //     return $request->user();
 // });
 
-
 Route::get('/category-list', [ApiController::class, 'listCategories']);
 Route::get('/menu-list', [ApiController::class, 'listMenus']);
 Route::get('/table-list', [ApiController::class, 'listTables']);
@@ -27,6 +26,5 @@ Route::post('/select-table', [ApiController::class, 'selectTable']);
 Route::post('/search-menu', [ApiController::class, 'searchByMenu']);
 Route::post('/insert-order', [ApiController::class, 'insertOrder']);
 Route::get('/get-order', [ApiController::class, 'getOrder']);
-Route::post('/update-order', [ApiController::class, 'updateOrder']);
 
 

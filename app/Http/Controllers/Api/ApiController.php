@@ -2,21 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Api\BaseController as BaseController;
-use App\Models\Category;
+use Validator;
 use App\Models\Menu;
 use App\Models\Table;
-use App\Models\UserOrder;
-use App\Models\ItemOrdered;
 use App\Models\Orders;
+use App\Models\Category;
 use App\Models\OrderDetails;
-use Validator;
-use App\Http\Resources\Category as CategoryResource;
-use App\Http\Resources\Menu as MenuResource;
-use App\Http\Resources\Table as TableResource;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Controllers\Api\BaseController as BaseController;
 
 class ApiController extends BaseController
 {
@@ -32,7 +26,7 @@ class ApiController extends BaseController
     //Category Listing Api
     public function listCategories(){
        $categories = Category::select('id as categoryId','category_name as categoryName')
-                     ->get();
+                     ->get()->toArray();
 
         if($categories){
             $this->data = $categories;
@@ -46,8 +40,7 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Something went wrong',
-            'data'      => $this->data
+            'message'   => 'No Category Found'
         ], $this->code);
     }
 
@@ -55,7 +48,7 @@ class ApiController extends BaseController
     public function listMenus(){
         $menus = Menu::where('menu_status', 1)
                  ->select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
-                 ->get();
+                 ->get()->toArray();
 
         if($menus){
             $this->data = $menus;
@@ -69,8 +62,7 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Something went wrong',
-            'data'      => $this->data
+            'message'   => 'No Menu Found'
         ], $this->code);
     }
 
@@ -78,7 +70,7 @@ class ApiController extends BaseController
     public function listTables(){
         $tables = Table::where('status', 1)
                   ->select('id as tableId','table_no as tableNo')
-                  ->get();
+                  ->get()->toArray();
 
         if($tables){
             $this->data = $tables;
@@ -92,8 +84,7 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Something went wrong',
-            'data'      => $this->data
+            'message'   => 'No Table Found'
         ], $this->code);
     }
 
@@ -102,7 +93,7 @@ class ApiController extends BaseController
     public function selectTable(Request $request){
         $data       = $request->only('tableId');
         $validator  = Validator::make($data, [
-            'tableId'      => 'required'
+            'tableId'      => 'required|exists:tables,id'
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
@@ -110,20 +101,11 @@ class ApiController extends BaseController
         //check if table already reserved
         $check = Table::where('id', $request->tableId)->first();
         if($check->status == '1'){
-            if($check)
-            {
-                $is_table_update = $check->update([
-                        'status'     => 0,
-                        'updated_at' => date('Y-m-d H:i:s'),
-                     ]);
-
-                if($is_table_update){
-                    return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');
-                }
-                else{
-                    return $this->sendError('No data found');
-                }
-            }
+            $is_table_update = $check->update([
+                                                'status'     => 0,
+                                                'updated_at' => date('Y-m-d H:i:s'),
+                                            ]);
+            return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');    
         }
         else{
             return $this->sendError('Table reserved already');
@@ -150,7 +132,7 @@ class ApiController extends BaseController
                         $query->where('menu_name', 'like', '%'.$searchValue.'%')
                               ->orWhere('menu_description','like', '%'.$searchValue.'%');
                         })
-                       ->get();
+                       ->get()->toArray();
 
     if($menus){
         $this->data = $menus;
@@ -164,128 +146,9 @@ class ApiController extends BaseController
         $this->success  = false;
         return response()->json([
         'success'   => $this->success,
-        'message'   => 'Something went wrong',
-        // 'data'      => $this->data
+        'message'   => 'No search found',
         ], $this->code);
     }
-
-    // public function insertOrders(Request $request)
-    // {
-    //     //Validate data
-    //     $data       = $request->only('tableId','menuId','quantity');
-    //     $validator  = Validator::make($data, [
-    //         'tableId'   => 'required|exists:tables,id',
-    //         'menuId'    => 'required|exists:menus,id',
-    //         'quantity'  => 'required',
-    //     ]);
-
-    //     //Send failed response if request is not valid
-    //     if ($validator->fails()) {
-    //         $this->success  = false;
-    //         return response()->json([
-    //             'success'   => $this->success,
-    //             'message'   => $validator->messages(),
-    //             // 'data'      => $this->data
-    //         ], $this->code);
-    //     }
-    //     $tableNo = Table::where('id', $request->tableId)->first();
-
-    //     //Request is valid, create new order
-    //     $order_details  = [
-    //         'table_no'    => $tableNo->table_no,
-    //         'order_on'  => date('Y-m-d H:i:s'),
-    //         'ordered_by'  => 'User',
-    //         'status'      =>  0,
-    //         'created_at'  => date('Y-m-d H:i:s'),
-    //     ];
-    //     $is_order_created = UserOrder::create($order_details);
-    //     $orderId = $is_order_created->id;
-
-    //     if (count($request->menuId) > 0) {
-    //         foreach($request->menuId as $item=>$v) {
-    //             $data = array(
-    //                 'table_no' => $request->tableId,
-    //                 'order_no' => 'Order'.$orderId.'',
-    //                 'menu_id'  => $request->menuId[$item],
-    //                 'quantity' => $request->quantity[$item],
-    //                 'amount'   => 0.00,
-    //                 'created_at'  => date('Y-m-d H:i:s')
-    //             );
-
-    //         $is_item_inserted = ItemOrdered::insert($data);
-    //         }
-    //     }
-
-    //     if($is_order_created && $is_item_inserted)
-    //     {
-    //         $this->data = $is_order_created && $is_item_inserted;
-    //         //order created, return success response
-    //         return response()->json([
-    //             'success'   => $this->success,
-    //             'message'   => 'Order created successfully',
-    //             'data'      => $this->data
-    //         ], $this->code);
-    //     }
-    //     $this->success  = false;
-    //     return response()->json([
-    //         'success'   => $this->success,
-    //         'message'   => 'Something went wrong',
-    //         'data'      => $this->data
-    //     ], $this->code);
-    // }
-
-    // public function getOrder(Request $request){
-    //     $data       = $request->only('tableId');
-    //     $validator  = Validator::make($data, [
-    //         'tableId'      => 'required|exists:tables,id,status,0'
-    //     ]);
-    //     if($validator->fails()){
-    //         return $this->sendError('Validation Error.', $validator->errors());
-    //     }
-
-    //     $tableOrder = ItemOrdered::where('item_ordereds.table_no', $request->tableId)
-    //                   ->join('tables as t', 'item_ordereds.table_no', '=' , 't.id')
-    //                   ->join('menus as m', 'item_ordereds.menu_id', '=' , 'm.id')
-    //                   ->select('item_ordereds.table_no as tableId','t.table_no as tableNo','m.id as menuId','m.menu_name as menuName','m.menu_description as menuDescription','m.menu_price as menuPrice', 'item_ordereds.quantity as quantity')
-    //                   ->get()
-    //                   ->toArray();
-
-    //     $order_array=array();
-    // if(count($tableOrder) > 0){
-    //     $sum = 0;
-    //     foreach($tableOrder as $key=>$order_value){
-    //         $data = array(
-    //              'tableId'    => $order_value['tableId'],
-    //              'tableNo'    => $order_value['tableNo'],
-    //              'menuId'     => $order_value['menuId'],
-    //              'menuName'   => $order_value['menuName'],
-    //              'menuDescription' => $order_value['menuDescription'],
-    //              'menuPrice'  => $order_value['menuPrice'],
-    //              'quantity'   => $order_value['quantity'],
-    //              'orderPrice' =>  $order_value['menuPrice'] * $order_value['quantity'],
-    //         );
-    //     array_push($order_array , $data);
-    //     }
-    // }
-    // $total_amount = array_sum(array_column($order_array, 'order_price'));
-    // if($order_array){
-    //         $this->data['order_data'] = $order_array;
-    //         $this->data['total_amount'] =  $total_amount ;
-
-    // //order fetched, return success response
-    //     return response()->json([
-    //         'success'   => $this->success,
-    //         'message'   => 'Order fetched successfully',
-    //         'data'      => $this->data
-    //         ], $this->code);
-    //     }
-    //     $this->success  = false;
-    //     return response()->json([
-    //         'success'   => $this->success,
-    //         'message'   => 'Something went wrong',
-    //         'data'      => $this->data
-    //         ], $this->code);
-    // }
 
     public function insertOrder(Request $request){
         //Validate data
@@ -293,7 +156,7 @@ class ApiController extends BaseController
         $validator  = Validator::make($data, [
             'tableId'   => 'required|exists:tables,id,status,0',
             'menuId'    => 'required|exists:menus,id',
-            'quantity'  => 'required',
+            'quantity'  => 'required'
         ]);
 
         //Send failed response if request is not valid
@@ -337,7 +200,7 @@ class ApiController extends BaseController
                     'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
                 ];
 
-                $order_details_insert = OrderDetails::create($order_details);
+                OrderDetails::create($order_details);
 
                 $order_total_amount += $menu_price->menu_price*$request->quantity[$key];
             }
@@ -391,29 +254,10 @@ class ApiController extends BaseController
         $this->data['order']['orderDetails'] = $order_details;
 
         //order fetched, return success response
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => 'Order fetched successfully',
-                'data'      => $this->data
-                ], $this->code);
-    }
-
-    public function updateOrder(Request $request){
-        $data   = $request->only('orderId');
-
-        $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id'
-        ]);
-
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => 'Order fetched successfully',
+            'data'      => $this->data
             ], $this->code);
-        }
-
-        // $existingMenu = ;
     }
 }
