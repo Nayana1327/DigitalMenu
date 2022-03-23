@@ -26,6 +26,7 @@ Route::post('/select-table', [ApiController::class, 'selectTable']);
 Route::post('/search-menu', [ApiController::class, 'searchByMenu']);
 Route::post('/insert-order', [ApiController::class, 'insertOrder']);
 Route::get('/get-order', [ApiController::class, 'getOrder']);
-Route::post('/update-order', [ApiController::class, 'updateOrders']);
+Route::post('/update-order', [ApiController::class, 'updateOrder']);
+Route::post('/delete-order', [ApiController::class, 'deleteOrder']);
 
 
