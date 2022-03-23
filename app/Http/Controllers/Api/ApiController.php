@@ -108,7 +108,7 @@ class ApiController extends BaseController
                                                 'status'     => 0,
                                                 'updated_at' => date('Y-m-d H:i:s'),
                                             ]);
-            return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');    
+            return $this->sendResponse($is_table_update , 'Tables selected successfully. Start exploring our food.');
         }
         else{
             return $this->sendError('Table reserved already');
@@ -257,15 +257,24 @@ class ApiController extends BaseController
                             ->get()
                             ->toArray();
 
-        $this->data['order'] = $order[0];
-        $this->data['order']['orderDetails'] = $order_details;
+        if($order){
+            $this->data['order'] = $order[0];
+            $this->data['order']['orderDetails'] = $order_details;
 
-        //order fetched, return success response
+            //order fetched, return success response
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Order fetched successfully',
+                'data'      => $this->data
+                ], $this->code);
+        }
+
+        $this->success  = false;
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Order fetched successfully',
+            'message'   => "No orders found",
             'data'      => $this->data
-            ], $this->code);
+        ], $this->code);
     }
 
     public function updateOrder(Request $request){
@@ -298,7 +307,7 @@ class ApiController extends BaseController
                                                     'menu_id' => $value
                                                 ])
                                             ->first();
-            
+
             if($existingMenu){
                 OrderDetails::where('id', $existingMenu->id)
                                 ->update([
@@ -351,19 +360,19 @@ class ApiController extends BaseController
             $table_id   = $deleteOrder->table_id;
             $deleteOrder->update(['order_status' => 'Order Cancelled']);
             $deleteOrder->delete();
-            
+
             Table::where('id', $table_id)
                     ->update([
                                 'status'     => 1,
                                 'updated_at' => date('Y-m-d H:i:s')
                             ]);
-    
+
             //order deleted, return success response
             return response()->json([
                 'success'   => $this->success,
                 'message'   => 'Order cancelled successfully',
                 'data'      => $this->data
-            ], $this->code);            
+            ], $this->code);
         }
         $this->success  = false;
         return response()->json([
