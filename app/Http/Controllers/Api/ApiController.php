@@ -156,11 +156,12 @@ class ApiController extends BaseController
 
     public function insertOrder(Request $request){
         //Validate data
-        $data       = $request->only('tableId','menuId','quantity');
+        $data       = json_decode($request->getContent(),true);
         $validator  = Validator::make($data, [
             'tableId'   => 'required|exists:tables,id,status,0',
-            'menuId'    => 'required|exists:menus,id',
-            'quantity'  => 'required'
+            'menuData'  => 'required|array',
+            'menuData.*.menuId'     => 'required|exists:menus,id',
+            'menuData.*.quantity'   => 'required',            
         ]);
 
         //Send failed response if request is not valid
@@ -173,7 +174,7 @@ class ApiController extends BaseController
             ], $this->code);
         }
 
-        $existingOrder = Orders::where('table_id', $request->tableId)->get('id')->toArray();
+        $existingOrder = Orders::where('table_id', $data['tableId'])->get('id')->toArray();
 
         if($existingOrder){
             $this->success  = false;
@@ -182,34 +183,32 @@ class ApiController extends BaseController
                 'message'   => "Table order already exist. Please update.",
                 'data'      => $this->data
             ], $this->code);
-        }
+        }   
 
         $order = [
-            'table_id'  => $request->tableId
+            'table_id'  => $data['tableId']
         ];
 
         $order_insert = Orders::create($order);
 
         $order_total_amount = 0;
 
-        if (count($request->menuId) > 0) {
-            foreach($request->menuId as $key => $value) {
-                $menu_price = 0;
-                $order_details = [];
+        foreach($data['menuData'] as $key => $value){
+            $menu_price = 0;
+            $order_details = [];
 
-                $menu_price = Menu::find($value);
+            $menu_price = Menu::find($value['menuId']);
 
-                $order_details = [
-                    'order_id'  => $order_insert->id,
-                    'menu_id'   => $value,
-                    'quantity'  => $request->quantity[$key],
-                    'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
-                ];
+            $order_details = [
+                'order_id'  => $order_insert->id,
+                'menu_id'   => $value['menuId'],
+                'quantity'  => $value['quantity'],
+                'menu_total_amount' => $menu_price->menu_price*$value['quantity']
+            ];
 
-                OrderDetails::create($order_details);
+            OrderDetails::create($order_details);
 
-                $order_total_amount += $menu_price->menu_price*$request->quantity[$key];
-            }
+            $order_total_amount += $menu_price->menu_price*$value['quantity'];
         }
 
         Orders::where('id', $order_insert->id)->update(['order_total_amount' => $order_total_amount]);
@@ -278,12 +277,13 @@ class ApiController extends BaseController
     }
 
     public function updateOrder(Request $request){
-        $data   = $request->only('orderId','menuId','quantity');
+        $data       = json_decode($request->getContent(),true);
 
         $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id',
-            'menuId'    => 'required|exists:menus,id',
-            'quantity'  => 'required',
+            'orderId'   => 'required|exists:orders,id,deleted_at,NULL',
+            'menuData'  => 'required|array',
+            'menuData.*.menuId'     => 'required|exists:menus,id',
+            'menuData.*.quantity'   => 'required',            
         ]);
 
         //Send failed response if request is not valid
@@ -294,41 +294,41 @@ class ApiController extends BaseController
                 'message'   => $validator->messages(),
                 'data'      => $this->data
             ], $this->code);
-        }
+        }   
 
-        foreach($request->menuId as $key => $value){
+        foreach($data['menuData'] as $key => $value){
             $menu_price = 0;
             $order_details = [];
 
-            $menu_price = Menu::find($value);
+            $menu_price = Menu::find($value['menuId']);
 
             $existingMenu = OrderDetails::where([
-                                                    'order_id' => $request->orderId,
-                                                    'menu_id' => $value
+                                                    'order_id' => $data['orderId'],
+                                                    'menu_id' => $value['menuId']
                                                 ])
                                             ->first();
 
             if($existingMenu){
                 OrderDetails::where('id', $existingMenu->id)
                                 ->update([
-                                            'quantity' => $request->quantity[$key],
-                                            'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
+                                            'quantity' => $value['quantity'],
+                                            'menu_total_amount' => $menu_price->menu_price*$value['quantity']
                                         ]);
             }else{
                 $order_details = [
-                    'order_id'  => $request->orderId,
-                    'menu_id'   => $value,
-                    'quantity'  => $request->quantity[$key],
-                    'menu_total_amount' => $menu_price->menu_price*$request->quantity[$key]
+                    'order_id'  => $data['orderId'],
+                    'menu_id'   => $value['menuId'],
+                    'quantity'  => $value['quantity'],
+                    'menu_total_amount' => $menu_price->menu_price*$value['quantity']
                 ];
 
                 OrderDetails::create($order_details);
             }
         }
+        
+        $order_total_amount = OrderDetails::where('order_id', $data['orderId'])->sum('menu_total_amount');
 
-        $order_total_amount = OrderDetails::where('order_id', $request->orderId)->sum('menu_total_amount');
-
-        Orders::where('id', $request->orderId)->update(['order_total_amount' => $order_total_amount]);
+        Orders::where('id', $data['orderId'])->update(['order_total_amount' => $order_total_amount]);
 
         //order updated, return success response
         return response()->json([
