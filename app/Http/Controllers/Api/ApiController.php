@@ -70,9 +70,7 @@ class ApiController extends BaseController
 
     //Available Table Listing Api
     public function listTables(){
-        $tables = Table::where('status', 1)
-                        ->select('id as tableId','table_no as tableNo')
-                        ->get()->toArray();
+        $tables = Table::select('id as tableId','table_no as tableNo')->get()->toArray();
 
         if($tables){
             $this->data = $tables;
@@ -282,7 +280,7 @@ class ApiController extends BaseController
         $order_details = Orders::where('orders.id', $request->orderId)
                             ->join('order_details', 'order_details.order_id', '=', 'orders.id')
                             ->join('menus', 'menus.id', '=', 'order_details.menu_id')
-                            ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
+                            ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
                             ->get()
                             ->toArray();
 
@@ -312,8 +310,6 @@ class ApiController extends BaseController
         $validator  = Validator::make($data, [
             'orderId'   => 'required|exists:orders,id,deleted_at,NULL',
             'menuData'  => 'required|array'
-            // 'menuData.*.menuId'     => 'required|exists:menus,id',
-            // 'menuData.*.quantity'   => 'required',
         ]);
 
         //Send failed response if request is not valid
@@ -447,3 +443,4 @@ class ApiController extends BaseController
 
     }
 }
+
