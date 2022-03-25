@@ -452,7 +452,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "No Order's Placed",
-                'data'      => $this->data
+                'data'      => NULL
             ], $this->code);
         }
 
