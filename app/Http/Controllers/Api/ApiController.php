@@ -451,7 +451,7 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => $validator->messages(),
+                'message'   => "No Order's Placed",
                 'data'      => $this->data
             ], $this->code);
         }
