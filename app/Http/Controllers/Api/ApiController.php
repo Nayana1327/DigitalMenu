@@ -439,8 +439,55 @@ class ApiController extends BaseController
             'data'      => $this->data
         ], $this->code);
     }
-    public function tableOrder(Request $request){
+    public function getTableOrder(Request $request){
+        $data   = $request->only('tableId');
 
+        $validator  = Validator::make($data, [
+            'tableId'   => 'required|exists:orders,table_id'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
+
+        $order = Orders::where('orders.table_id', $request->tableId)
+                    ->join('tables', 'tables.id', '=', 'orders.table_id')
+                    ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
+                    ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
+                    ->get()
+                    ->toArray();
+
+        $order_details = Orders::where('orders.table_id', $request->tableId)
+                            ->join('order_details', 'order_details.order_id', '=', 'orders.id')
+                            ->join('menus', 'menus.id', '=', 'order_details.menu_id')
+                            ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
+                            ->get()
+                            ->toArray();
+
+        if($order){
+            $this->data['order'] = $order[0];
+            $this->data['order']['orderDetails'] = $order_details;
+
+            //order fetched, return success response
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Order fetched successfully',
+                'data'      => $this->data
+                ], $this->code);
+        }
+
+        $this->success  = false;
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => "No orders found",
+            'data'      => $this->data
+        ], $this->code);
     }
 }
 

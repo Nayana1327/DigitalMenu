@@ -28,5 +28,6 @@ Route::post('/insert-order', [ApiController::class, 'insertOrder']);
 Route::get('/get-order', [ApiController::class, 'getOrder']);
 Route::post('/update-order', [ApiController::class, 'updateOrder']);
 Route::post('/delete-order', [ApiController::class, 'deleteOrder']);
+Route::get('/table-order', [ApiController::class, 'getTableOrder']);
 
 
