@@ -71,8 +71,8 @@ class ApiController extends BaseController
     //Available Table Listing Api
     public function listTables(){
         $tables = Table::where('status', 1)
-                  ->select('id as tableId','table_no as tableNo')
-                  ->get()->toArray();
+                        ->select('id as tableId','table_no as tableNo')
+                        ->get();
 
         if($tables){
             $this->data = $tables;
@@ -159,9 +159,7 @@ class ApiController extends BaseController
         $data       = json_decode($request->getContent(),true);
         $validator  = Validator::make($data, [
             'tableId'   => 'required|exists:tables,id,status,0',
-            'menuData'  => 'required|array',
-            'menuData.*.menuId'     => 'required|exists:menus,id',
-            'menuData.*.quantity'   => 'required',            
+            'menuData'  => 'required|array'
         ]);
 
         //Send failed response if request is not valid
@@ -174,6 +172,38 @@ class ApiController extends BaseController
             ], $this->code);
         }
 
+        $index = 0;
+        $flag = 0;
+
+        foreach($data['menuData'] as $key => $value){
+            $menu = Menu::find($value['menuId']);
+
+            if(is_null($menu)){
+                $response[$index]['message']  = 'The selected menuId is invalid.';
+                $response[$index]['arrayKey'] = $key;
+                $response[$index]['arrayValue']   = 'menuId';
+                $index += 1;
+                $flag = 1;
+            }
+
+            if(empty($value['quantity'])){
+                $response[$index]['message']  = 'The selected quantity is invalid.';
+                $response[$index]['arrayKey'] = $key;
+                $response[$index]['arrayValue']   = 'quantity';
+                $index += 1;
+                $flag = 1;
+            }
+        }
+
+        if($flag == 1){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Validation Error',
+                'errorData' => $response
+            ], $this->code);
+        }
+
         $existingOrder = Orders::where('table_id', $data['tableId'])->get('id')->toArray();
 
         if($existingOrder){
@@ -183,7 +213,7 @@ class ApiController extends BaseController
                 'message'   => "Table order already exist. Please update.",
                 'data'      => $this->data
             ], $this->code);
-        }   
+        }
 
         $order = [
             'table_id'  => $data['tableId']
@@ -281,9 +311,9 @@ class ApiController extends BaseController
 
         $validator  = Validator::make($data, [
             'orderId'   => 'required|exists:orders,id,deleted_at,NULL',
-            'menuData'  => 'required|array',
-            'menuData.*.menuId'     => 'required|exists:menus,id',
-            'menuData.*.quantity'   => 'required',            
+            'menuData'  => 'required|array'
+            // 'menuData.*.menuId'     => 'required|exists:menus,id',
+            // 'menuData.*.quantity'   => 'required',
         ]);
 
         //Send failed response if request is not valid
@@ -294,7 +324,39 @@ class ApiController extends BaseController
                 'message'   => $validator->messages(),
                 'data'      => $this->data
             ], $this->code);
-        }   
+        }
+
+        $index = 0;
+        $flag = 0;
+
+        foreach($data['menuData'] as $key => $value){
+            $menu = Menu::find($value['menuId']);
+
+            if(is_null($menu)){
+                $response[$index]['message']  = 'The selected menuId is invalid.';
+                $response[$index]['arrayKey'] = $key;
+                $response[$index]['arrayValue']   = 'menuId';
+                $index += 1;
+                $flag = 1;
+            }
+
+            if(empty($value['quantity'])){
+                $response[$index]['message']  = 'The selected quantity is invalid.';
+                $response[$index]['arrayKey'] = $key;
+                $response[$index]['arrayValue']   = 'quantity';
+                $index += 1;
+                $flag = 1;
+            }
+        }
+
+        if($flag == 1){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Validation Error',
+                'errorData' => $response
+            ], $this->code);
+        }
 
         foreach($data['menuData'] as $key => $value){
             $menu_price = 0;
@@ -325,7 +387,7 @@ class ApiController extends BaseController
                 OrderDetails::create($order_details);
             }
         }
-        
+
         $order_total_amount = OrderDetails::where('order_id', $data['orderId'])->sum('menu_total_amount');
 
         Orders::where('id', $data['orderId'])->update(['order_total_amount' => $order_total_amount]);
@@ -380,5 +442,8 @@ class ApiController extends BaseController
             'message'   => "No order found",
             'data'      => $this->data
         ], $this->code);
+    }
+    public function tableOrder(Request $request){
+
     }
 }
