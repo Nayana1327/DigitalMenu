@@ -6,7 +6,9 @@ use Validator;
 use App\Models\Menu;
 use App\Models\Table;
 use App\Models\Orders;
+use App\Models\Waiter;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use App\Models\OrderDetails;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -488,6 +490,96 @@ class ApiController extends BaseController
             'message'   => "No orders found",
             'data'      => NULL
         ], $this->code);
+    }
+
+    public function sendNotification(Request $request){
+
+        // $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
+        $firebaseToken = "eZ89g9mESOuPd9jAKcBtAZ:APA91bGdqVWN1Ab-EuKtTTHdA6OBsEAP8mbBxEPCHehnlpRMUfsoGMOAGmxAHYpc69V_5rhoOJP4NMNf3BMKnBZljRfELjAFKf69NHtk09Csw49FD8bA8B07TKuJRKyEl220XGFF3VEw";
+        $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+        $data = [
+            "registration_ids" => array($firebaseToken),
+            "notification" => [
+                "title" => "Test",
+                "body" => "Firebase Notification Testing",
+            ]
+        ];
+
+        $dataString = json_encode($data);
+
+        $headers = [
+            'Authorization: key=' . $SERVER_API_KEY,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+        $response = curl_exec($ch);
+
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => 'Notification send successfully.',
+            'data'      => $response
+            ], $this->code);
+    }
+
+    public function waiterLogin(Request $request){
+        $data       = json_decode($request->getContent(),true);
+
+        $validator  = Validator::make($data, [
+            'email'   => 'required|email|exists:waiters,email',
+            'password'  => 'required'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
+
+        $waiter = Waiter::where(['email' => $data['email'], 'password' => $data['password']])->first();
+
+        // dd()
+
+        if($waiter){
+            do {
+                $token = Str::random(50);
+            } while (Waiter::where('remember_token', '=', $token)->first() instanceof Waiter);
+
+            Waiter::where('id', $waiter->id)
+                    ->update([
+                                'remember_token'    => $token,
+                                'updated_at'    => date('Y-m-d H:i:s')
+                            ]);
+
+            $this->data['token'] = $token;
+
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Logged In successfully.',
+                'data'      => $this->data
+                ], $this->code);
+        }else{
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => 'Please check password.',
+                'data'      => $this->data
+                ], $this->code);
+        }
+    }
+    
+    public function test(){
+        echo "success";
     }
 }
 

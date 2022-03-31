@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Middleware\verifyApiToken;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,4 +31,10 @@ Route::post('/update-order', [ApiController::class, 'updateOrder']);
 Route::post('/delete-order', [ApiController::class, 'deleteOrder']);
 Route::get('/table-order', [ApiController::class, 'getTableOrder']);
 
+Route::post('/sendNotification', [ApiController::class, 'sendNotification']);
+Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
 
+
+Route::middleware([verifyApiToken::class])->group(function () {
+    Route::get('/test', [ApiController::class, 'test']);
+});
