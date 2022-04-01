@@ -47,11 +47,11 @@
                                   <thead>
                                       <tr>
                                           <th>S. No.</th>
-                                          <th>Order No.</th>
+                                          {{--  <th>Order No.</th>
                                           <th>Table No.</th>
                                           <th>Order On</th>
                                           <th>Order By</th>
-                                          <th>Items Ordered</th>
+                                          <th>Items Ordered</th>  --}}
                                           <th>Total Amount</th>
                                           <th>Status</th>
                                       </tr>

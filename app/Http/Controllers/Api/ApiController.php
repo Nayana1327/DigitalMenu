@@ -137,6 +137,10 @@ class ApiController extends BaseController
                         })
                        ->get()->toArray();
 
+        foreach($menus as $key => $value){
+            $menus[$key]['menuImage'] = asset('storage/menu_item_images/' . $value['menuImage']);
+        }
+
     if($menus){
         $this->data = $menus;
         //return success response
@@ -549,8 +553,6 @@ class ApiController extends BaseController
 
         $waiter = Waiter::where(['email' => $data['email'], 'password' => $data['password']])->first();
 
-        // dd()
-
         if($waiter){
             do {
                 $token = Str::random(50);
@@ -577,7 +579,7 @@ class ApiController extends BaseController
                 ], $this->code);
         }
     }
-    
+
     public function test(){
         echo "success";
     }

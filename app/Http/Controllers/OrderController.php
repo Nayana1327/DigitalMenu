@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
+use App\Models\Orders;
 use DataTables;
 use Response;
 use App\Exports\OrderExport;
@@ -24,7 +24,7 @@ class OrderController extends Controller
     public function orderList(Request $request)
     {   
         if ($request->ajax()) {
-            $data   = Order::all();
+            $data   = Orders::all();
             return DataTables::of($data)
                     ->addIndexColumn()
                     ->make(true);
@@ -35,7 +35,7 @@ class OrderController extends Controller
     public function reportView(Request $request)
     {   
         if ($request->ajax()) {
-            $data   = Order::where('status', '3')
+            $data   = Orders::where('status', '3')
                       ->get();
             return DataTables::of($data)
                     ->addIndexColumn()

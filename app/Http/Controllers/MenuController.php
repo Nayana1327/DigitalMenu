@@ -24,17 +24,17 @@ class MenuController extends Controller
     {
         $this->middleware('auth');
     }
-   
+
 
     public function menuList(Request $request)
-    {   
+    {
         if ($request->ajax()) {
             $data   = Menu::all();
             return DataTables::of($data)
                     ->addIndexColumn()
-                    ->addColumn('menu_image', function ($data){ 
-                        $url=asset("storage/public/menu_item_images/$data->menu_image"); 
-                        return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />'; 
+                    ->addColumn('menu_image', function ($data){
+                        $url=asset("storage/menu_item_images/$data->menu_image");
+                        return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />';
                     })
                     ->addColumn('menu_status',function ($data){
                         $b_url = \URL::to('/');
@@ -58,7 +58,7 @@ class MenuController extends Controller
     }
 
     public function menuUnactivate(Request $request)
-    { 
+    {
         $menu_details  = Menu::find($request->id);
         $is_unactivated = Menu::where('id', $request->id)
                         ->update([
@@ -78,7 +78,7 @@ class MenuController extends Controller
     }
 
     public function menuActivate(Request $request)
-    { 
+    {
         $menu_details   = Menu::find($request->id);
         $is_activated = Menu::where('id', $request->id)
                         ->update([
@@ -96,14 +96,14 @@ class MenuController extends Controller
             'message'   => "Something Went Wrong"
         ]);
     }
-    
+
 
     public function menuAddView()
-    { 
+    {
         $category = Category::all();
         $cuisine = Cuisine::all();
         $portion = Portion::all();
-        
+
         return view('admin.pages.menu-add', compact(['category', 'cuisine', 'portion']));
     }
 
@@ -130,10 +130,10 @@ class MenuController extends Controller
         $fileNameToStore = $time.'.'.$extension;
 
         //upload image
-        $path = $request->file('menu_file_name')->storeAs('public/menu_item_images', $fileNameToStore);
+        $path = $request->file('menu_file_name')->storeAs('menu_item_images', $fileNameToStore);
 
         // $imageName = 'public/menu_item_images/'.$request->menu_name.'_'.time().'.'.$extension.'';
-        
+
 
         $menu_details = [
             'menu_name'        => $request->menu_name,
@@ -150,13 +150,13 @@ class MenuController extends Controller
         $is_inserted = Menu::insert($menu_details);
         if($is_inserted)
         {
-            $request->session()->flash('message', 'Food Item created successfully!'); 
+            $request->session()->flash('message', 'Food Item created successfully!');
         }
         else
         {
-            $request->session()->flash('message', ' failed!'); 
+            $request->session()->flash('message', ' failed!');
         }
-        $request->session()->flash('alert-class', 'alert-success'); 
+        $request->session()->flash('alert-class', 'alert-success');
         return redirect(route('menu-list'));
     }
 
@@ -166,8 +166,8 @@ class MenuController extends Controller
         $category = Category::all();
         $cuisine = Cuisine::all();
         $portion = Portion::all();
-        
-        return view('admin.pages.menu-edit', compact(['menu_details','category','cuisine','portion']));  
+
+        return view('admin.pages.menu-edit', compact(['menu_details','category','cuisine','portion']));
     }
 
     public function menuUpdate(Request $request){
@@ -219,13 +219,13 @@ class MenuController extends Controller
                                 ]);
 
         if($is_updated){
-            $request->session()->flash('message', 'Food Item edited successfully!'); 
+            $request->session()->flash('message', 'Food Item edited successfully!');
         } else{
-            $request->session()->flash('message', ' failed!'); 
+            $request->session()->flash('message', ' failed!');
         }
-        $request->session()->flash('alert-class', 'alert-success'); 
+        $request->session()->flash('alert-class', 'alert-success');
         return redirect(route('menu-list'));
-        
+
     }
 
     public function menuDelete(Request $request)
