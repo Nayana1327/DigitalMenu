@@ -20,10 +20,10 @@
         @if(Session::has('message'))
         <div class="pad margin no-print">
             <div class="callout {{ Session::get('callout-class', 'callout-success') }}" style="margin-bottom: 0!important;">
-                {{ Session::get('message') }}
+                {{ Session::get('message') }}  
             </div>
         </div>
-        @endif
+        @endif  
       </div><!-- /.container-fluid -->
     </section>
 
@@ -77,7 +77,7 @@
                                             <select class="form-control select2"  name="menu_category" id="menu_category">
                                                 <option selected disabled>Select Category</option>
                                                 @foreach($category as $each_category)
-                                                    <option value="{{$each_category->category_name}}" @if($each_category->category_name==$menu_details->menu_category){{"selected"}} @endif>{{$each_category->category_name}}</option>
+                                                    <option value="{{$each_category->category_name}}" @if($each_category->category_name==$menu_details->menu_category){{"selected"}} @endif>{{$each_category->category_name}}</option>  
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('menu_category'))
@@ -92,7 +92,7 @@
                                             <label>Sub Category</label><span class="form_required">*</span>
                                             <select class="form-control select2"  name="sub_category" id="sub_category">
                                                 <option selected disabled>Select Subcategory</option>
-
+                                                
                                                 <option {{ ($menu_details->sub_category) == 'Veg' ? 'selected' : '' }}  value="Veg">Veg</option>
                                                 <option {{ ($menu_details->sub_category) == 'Non-Veg' ? 'selected' : '' }}  value="Non-Veg">Non-Veg</option>
                                             </select>
@@ -111,7 +111,7 @@
                                             <select class="form-control select2"  name="menu_cuisine" id="menu_cuisine">
                                                 <option selected disabled>Select Cuisine</option>
                                                 @foreach($cuisine as $each_cuisine)
-                                                    <option value="{{$each_cuisine->cuisine_name}}" @if($each_cuisine->cuisine_name==$menu_details->menu_cuisine){{"selected"}} @endif>{{$each_cuisine->cuisine_name}}</option>
+                                                    <option value="{{$each_cuisine->cuisine_name}}" @if($each_cuisine->cuisine_name==$menu_details->menu_cuisine){{"selected"}} @endif>{{$each_cuisine->cuisine_name}}</option>  
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('menu_cuisine'))
@@ -127,7 +127,7 @@
                                             <select class="form-control select2"  name="menu_portion" id="menu_portion">
                                                 <option selected disabled>Select Portion</option>
                                                 @foreach($portion as $each_portion)
-                                                    <option value="{{$each_portion->portion_name}}" @if($each_portion->portion_name==$menu_details->menu_portion){{"selected"}} @endif>{{$each_portion->portion_name}}</option>
+                                                    <option value="{{$each_portion->portion_name}}" @if($each_portion->portion_name==$menu_details->menu_portion){{"selected"}} @endif>{{$each_portion->portion_name}}</option>  
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('menu_portion'))
@@ -148,13 +148,13 @@
                                                 <strong class="error-text">{{ $errors->first('menu_price') }}</strong>
                                             </span>
                                             @endif
-                                        </div>
+                                        </div>  
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Image</label>
                                             <input type="file" name="menu_file_name" id="menu_file_name" class="form-control" placeholder="Choose Image" accept="image/png, image/jpeg, image/jpg" autocomplete="off">
-
+                                            
                                             @if($menu_details->menu_image)
                                                     <img width="150" height="100" class='image_uploaded_image' src="{{ url('storage/menu_item_images/'.$menu_details->menu_image) }}" />
                                                     <img width="150" height="100" class='image_selected_image' style='display:none;' src="#"  />
@@ -217,7 +217,7 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
+        
         $('#menu_edit').validate({
             rules: {
                 menu_name: {
@@ -251,7 +251,7 @@
                 menu_file_name: {
                     required: false
                 },
-
+                
             },
             errorElement: 'span',
             errorPlacement: function (error, element) {
@@ -265,7 +265,7 @@
                 $(element).removeClass('is-invalid');
             }
         });
-
+        
     });
     $("#menu_image_clear").on("click", function () {
         $("#menu_file_name").val(null);
@@ -277,7 +277,7 @@
     $('#menu_edit_form_cancel').click(function(){
         window.location.href="{{ route('menu-list') }}";
     })
-
+    
 </script>
 
 @endsection
