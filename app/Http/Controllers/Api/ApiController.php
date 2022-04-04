@@ -162,7 +162,7 @@ class ApiController extends BaseController
         //Validate data
         $data       = json_decode($request->getContent(),true);
         $validator  = Validator::make($data, [
-            'tableId'   => 'required|exists:tables,id,status,0',
+            'tableId'   => 'required|exists:tables,id|unique:orders,table_id,NULL,id,deleted_at,NULL',
             'menuData'  => 'required|array'
         ]);
 
@@ -584,7 +584,7 @@ class ApiController extends BaseController
         $data   = $request->only('orderId');
 
         $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id'
+            'orderId'   => 'required|exists:orders,id,deleted_at,NULL'
         ]);
 
         //Send failed response if request is not valid
@@ -618,20 +618,23 @@ class ApiController extends BaseController
         }else{
             $order->waiter_id = $waiter->id;
             $order->order_status = "Payment Done";
+            $order->deleted_at = date('Y-m-d H:i:s');
             $order->save();
         }
 
-        $orderCompletion = Orders::where('orders.id', $request->orderId)
+        $orderCompletion = Orders::where('orders.id', $data['orderId'])
                                     ->join('tables', 'tables.id', '=', 'orders.table_id')
                                     ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
                                     ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
+                                    ->withTrashed()
                                     ->get()
                                     ->toArray();
 
-        $order_details = Orders::where('orders.id', $request->orderId)
+        $order_details = Orders::where('orders.id', $data['orderId'])
                                     ->join('order_details', 'order_details.order_id', '=', 'orders.id')
                                     ->join('menus', 'menus.id', '=', 'order_details.menu_id')
                                     ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
+                                    ->withTrashed()
                                     ->get()
                                     ->toArray();
 
