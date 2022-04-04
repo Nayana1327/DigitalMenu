@@ -197,7 +197,7 @@ class MenuController extends Controller
             $fileNameToStore = $time.'.'.$extension;
 
             //upload image
-            $path = $request->file('menu_file_name')->storeAs('public/menu_item_images', $fileNameToStore);
+            $path = $request->file('menu_file_name')->storeAs('menu_item_images', $fileNameToStore);
 
             // $imageName = 'public/menu_item_images/'.$request->menu_name.'_'.time().'.'.$extension.'';
             $menu_details->menu_image = $fileNameToStore;

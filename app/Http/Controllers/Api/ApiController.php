@@ -580,6 +580,71 @@ class ApiController extends BaseController
         }
     }
 
+    public function orderCompletion(Request $request){
+        $data   = $request->only('orderId');
+
+        $validator  = Validator::make($data, [
+            'orderId'   => 'required|exists:orders,id'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
+
+        $waiter = Waiter::where("remember_token", "=", $request->headers->get("Authorization"))->first();
+
+        $order = Orders::find($data['orderId']);
+
+        if($order->order_status == "Payment Done"){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "This order already completed and the payment is done",
+                'data'      => $this->data
+            ], $this->code);
+        }elseif($order->order_status == "Order Cancelled"){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "This order has been cancelled already",
+                'data'      => $this->data
+            ], $this->code);
+        }else{
+            $order->waiter_id = $waiter->id;
+            $order->order_status = "Payment Done";
+            $order->save();
+        }
+
+        $orderCompletion = Orders::where('orders.id', $request->orderId)
+                                    ->join('tables', 'tables.id', '=', 'orders.table_id')
+                                    ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
+                                    ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
+                                    ->get()
+                                    ->toArray();
+
+        $order_details = Orders::where('orders.id', $request->orderId)
+                                    ->join('order_details', 'order_details.order_id', '=', 'orders.id')
+                                    ->join('menus', 'menus.id', '=', 'order_details.menu_id')
+                                    ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
+                                    ->get()
+                                    ->toArray();
+
+        $this->data['order'] = $orderCompletion[0];
+        $this->data['order']['orderDetails'] = $order_details;
+
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => 'Order Completed',
+            'data'      => $this->data
+            ], $this->code);
+    }
+
     public function test(){
         echo "success";
     }
