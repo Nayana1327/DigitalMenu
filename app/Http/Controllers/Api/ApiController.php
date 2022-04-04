@@ -72,7 +72,7 @@ class ApiController extends BaseController
 
     //Available Table Listing Api
     public function listTables(){
-        $tables = Table::select('id as tableId','table_no as tableNo')->get()->toArray();
+        $tables = Table::select('id as tableId','table_no as tableNo', 'status')->get()->toArray();
 
         if($tables){
             $this->data = $tables;
