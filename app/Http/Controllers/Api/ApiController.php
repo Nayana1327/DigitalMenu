@@ -176,6 +176,12 @@ class ApiController extends BaseController
             ], $this->code);
         }
 
+        Table::where('id', $data['tableId'])
+                ->update([
+                            'status'     => 0,
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+
         $index = 0;
         $flag = 0;
 
@@ -616,6 +622,7 @@ class ApiController extends BaseController
                 'data'      => $this->data
             ], $this->code);
         }else{
+            Table::where('id', $order->table_id )->update(['status' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
             $order->waiter_id = $waiter->id;
             $order->order_status = "Payment Done";
             $order->deleted_at = date('Y-m-d H:i:s');
