@@ -10,8 +10,4 @@ class Table extends Model
     use HasFactory;
     protected $table = 'tables';
     protected $fillable = ['table_name','table_no','image','status'];
-
-    public function getStatusAttribute($value) {
-        return ($value) ? false : true;
-    }
 }

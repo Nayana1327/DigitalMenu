@@ -75,6 +75,9 @@ class ApiController extends BaseController
         $tables = Table::select('id as tableId','table_no as tableNo', 'status')->get()->toArray();
 
         if($tables){
+            foreach($tables as $key => $value){
+                $tables[$key]['status'] = (($value['status'] == 1) ? true:false);
+            }
             $this->data = $tables;
             //return success response
             return response()->json([
@@ -171,8 +174,8 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
+                'message'   => 'Error Found',
+                'data'      => $validator->messages()
             ], $this->code);
         }
 

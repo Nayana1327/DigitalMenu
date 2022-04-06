@@ -24,14 +24,14 @@ class TableController extends Controller
     }
 
     public function tableList(Request $request)
-    {   
+    {
         if ($request->ajax()) {
             $data   = Table::all();
             return DataTables::of($data)
                     ->addIndexColumn()
-                    ->addColumn('image', function ($data){ 
-                        $url=asset($data->image); 
-                        return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />'; 
+                    ->addColumn('image', function ($data){
+                        $url=asset($data->image);
+                        return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />';
                     })
                     ->addColumn('status',function ($data){
                         return
@@ -39,7 +39,7 @@ class TableController extends Controller
                    })
                     ->addColumn('action',function ($data){
                         $b_url = \URL::to('/');
-                       
+
                         return "<a href='$data->image' download ='$data->image' class='btn btn-xs btn-success'>Download QR</a>
                         <button onclick=deleteTable(".$data->id.") class='btn btn-xs btn-danger'><i class='fas fa-trash'></i></button>";
                     })
@@ -66,25 +66,25 @@ class TableController extends Controller
         $table_details = [
             'table_name' => $request->table_data,
             'table_no'   => $request->table_no,
-            'image'      => $img_url, 
+            'image'      => $img_url,
             'status'     => '1',
             'created_at' => date('Y-m-d H:i:s'),
         ];
         $is_inserted = Table::create($table_details);
-        
+
         $table_id = $is_inserted->id;
         $qrImage = QrCode::size(500)
                    ->generate($table_id, 'public/qr_images/'.$time.'.svg');
-        
+
         if($is_inserted)
         {
-            $request->session()->flash('message', 'Table QR data created successfully!'); 
+            $request->session()->flash('message', 'Table QR data created successfully!');
         }
         else
         {
-            $request->session()->flash('message', ' failed!'); 
+            $request->session()->flash('message', ' failed!');
         }
-        $request->session()->flash('alert-class', 'alert-success'); 
+        $request->session()->flash('alert-class', 'alert-success');
         return redirect(route('table-list'));
     }
 
@@ -126,7 +126,7 @@ class TableController extends Controller
                     $b_url = \URL::to('/');
                     return
                     "<a href=".$b_url."/table-availability/".Crypt::encrypt($data->id)."/edit class='btn btn-xs btn-primary'><i class='fa fa-edit'></i></a>";
-                   
+
                 })
                 ->rawColumns(['status','action'])
                 ->make(true);
@@ -138,7 +138,7 @@ class TableController extends Controller
     public function tableAvailabilityEdit(Request $request){
         $decrypted_id  = Crypt::decrypt($request->id);
         $table_details  = Table::find($decrypted_id);
-        return view('admin.pages.table-availability-edit', compact(['table_details']));  
+        return view('admin.pages.table-availability-edit', compact(['table_details']));
     }
 
     public function tableAvailabilityUpdate(Request $request){
@@ -156,13 +156,13 @@ class TableController extends Controller
                                 ]);
 
         if($is_updated){
-            $request->session()->flash('message', 'Table availability successfully!'); 
+            $request->session()->flash('message', 'Table availability successfully!');
         } else{
-            $request->session()->flash('message', ' failed!'); 
+            $request->session()->flash('message', ' failed!');
         }
-        $request->session()->flash('alert-class', 'alert-success'); 
+        $request->session()->flash('alert-class', 'alert-success');
         return redirect(route('table-availability'));
-        
+
     }
 
 
