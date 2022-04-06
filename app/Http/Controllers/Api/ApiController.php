@@ -98,12 +98,12 @@ class ApiController extends BaseController
     //Table Selection Api
     public function selectTable(Request $request){
         $data       = $request->only('tableId');
-        $validator  = Validator::make($data, [
-            'tableId'      => 'required|exists:tables,id'
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
+        // $validator  = Validator::make($data, [
+        //     'tableId'      => 'required|exists:tables,id'
+        // ]);
+        // if($validator->fails()){
+        //     return $this->sendError('Validation Error.', $validator->errors());
+        // }
         //check if table already reserved
         $check = Table::where('id', $request->tableId)->first();
         if($check->status == '1'){
@@ -164,20 +164,20 @@ class ApiController extends BaseController
     public function insertOrder(Request $request){
         //Validate data
         $data       = json_decode($request->getContent(),true);
-        $validator  = Validator::make($data, [
-            'tableId'   => 'required|exists:tables,id|unique:orders,table_id,NULL,id,deleted_at,NULL',
-            'menuData'  => 'required|array'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'tableId'   => 'required|exists:tables,id|unique:orders,table_id,NULL,id,deleted_at,NULL',
+        //     'menuData'  => 'required|array'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => 'Error Found',
-                'data'      => $validator->messages()
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => 'Error Found',
+        //         'data'      => $validator->errors()
+        //     ], $this->code);
+        // }
 
         Table::where('id', $data['tableId'])
                 ->update([
@@ -271,19 +271,19 @@ class ApiController extends BaseController
     public function getOrder(Request $request){
         $data   = $request->only('orderId');
 
-        $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'orderId'   => 'required|exists:orders,id'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => $validator->messages(),
+        //         'data'      => $this->data
+        //     ], $this->code);
+        // }
 
         $order = Orders::where('orders.id', $request->orderId)
                     ->join('tables', 'tables.id', '=', 'orders.table_id')
@@ -322,20 +322,20 @@ class ApiController extends BaseController
     public function updateOrder(Request $request){
         $data       = json_decode($request->getContent(),true);
 
-        $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id,deleted_at,NULL',
-            'menuData'  => 'required|array'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'orderId'   => 'required|exists:orders,id,deleted_at,NULL',
+        //     'menuData'  => 'required|array'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => $validator->messages(),
+        //         'data'      => $this->data
+        //     ], $this->code);
+        // }
 
         $index = 0;
         $flag = 0;
@@ -414,19 +414,19 @@ class ApiController extends BaseController
     public function deleteOrder(Request $request){
         $data   = $request->only('orderId');
 
-        $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'orderId'   => 'required|exists:orders,id'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => $validator->messages(),
+        //         'data'      => $this->data
+        //     ], $this->code);
+        // }
 
         $deleteOrder = Orders::find($request->orderId);
         if($deleteOrder){
@@ -457,19 +457,19 @@ class ApiController extends BaseController
     public function getTableOrder(Request $request){
         $data   = $request->only('tableId');
 
-        $validator  = Validator::make($data, [
-            'tableId'   => 'required|exists:orders,table_id'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'tableId'   => 'required|exists:orders,table_id'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => "No Order's Placed",
-                'data'      => NULL
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => "No Order's Placed",
+        //         'data'      => NULL
+        //     ], $this->code);
+        // }
 
         $order = Orders::where('orders.table_id', $request->tableId)
                     ->join('tables', 'tables.id', '=', 'orders.table_id')
@@ -545,20 +545,20 @@ class ApiController extends BaseController
     public function waiterLogin(Request $request){
         $data       = json_decode($request->getContent(),true);
 
-        $validator  = Validator::make($data, [
-            'email'   => 'required|email|exists:waiters,email',
-            'password'  => 'required'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'email'   => 'required|email|exists:waiters,email',
+        //     'password'  => 'required'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => $validator->messages(),
+        //         'data'      => $this->data
+        //     ], $this->code);
+        // }
 
         $waiter = Waiter::where(['email' => $data['email'], 'password' => $data['password']])->first();
 
@@ -592,19 +592,19 @@ class ApiController extends BaseController
     public function orderCompletion(Request $request){
         $data   = $request->only('orderId');
 
-        $validator  = Validator::make($data, [
-            'orderId'   => 'required|exists:orders,id,deleted_at,NULL'
-        ]);
+        // $validator  = Validator::make($data, [
+        //     'orderId'   => 'required|exists:orders,id,deleted_at,NULL'
+        // ]);
 
-        //Send failed response if request is not valid
-        if ($validator->fails()) {
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
-        }
+        // //Send failed response if request is not valid
+        // if ($validator->fails()) {
+        //     $this->success  = false;
+        //     return response()->json([
+        //         'success'   => $this->success,
+        //         'message'   => $validator->messages(),
+        //         'data'      => $this->data
+        //     ], $this->code);
+        // }
 
         $waiter = Waiter::where("remember_token", "=", $request->headers->get("Authorization"))->first();
 
@@ -656,6 +656,10 @@ class ApiController extends BaseController
             'message'   => 'Order Completed',
             'data'      => $this->data
             ], $this->code);
+    }
+
+    public function deleteMenuItems(){
+
     }
 
     public function test(){
