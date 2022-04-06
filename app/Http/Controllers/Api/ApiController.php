@@ -162,49 +162,62 @@ class ApiController extends BaseController
     }
 
     public function insertOrder(Request $request){
-        //Validate data
-        $data       = json_decode($request->getContent(),true);
-        // $validator  = Validator::make($data, [
-        //     'tableId'   => 'required|exists:tables,id|unique:orders,table_id,NULL,id,deleted_at,NULL',
-        //     'menuData'  => 'required|array'
-        // ]);
+        $data   = json_decode($request->getContent(),true);
+        $index  = 0;
+        $flag   = 0;
 
-        // //Send failed response if request is not valid
-        // if ($validator->fails()) {
-        //     $this->success  = false;
-        //     return response()->json([
-        //         'success'   => $this->success,
-        //         'message'   => 'Error Found',
-        //         'data'      => $validator->errors()
-        //     ], $this->code);
-        // }
+        if(empty($data['tableId'])){
+            $response[$index]['message']  = 'Please enter table id.';
+            $response[$index]['fieldIndex'] = 0;
+            $response[$index]['fieldValue'] = 'tableId';
+            $index += 1;
+            $flag = 1;
+        }else{
+            $tableValidation = Table::where('id', $data['tableId'])->first();
+            $tableOrderValidation = Orders::where('table_id', $data['tableId'])->first();
 
-        Table::where('id', $data['tableId'])
-                ->update([
-                            'status'     => 0,
-                            'updated_at' => date('Y-m-d H:i:s'),
-                        ]);
-
-        $index = 0;
-        $flag = 0;
-
-        foreach($data['menuData'] as $key => $value){
-            $menu = Menu::find($value['menuId']);
-
-            if(is_null($menu)){
-                $response[$index]['message']  = 'The selected menuId is invalid.';
-                $response[$index]['arrayKey'] = $key;
-                $response[$index]['arrayValue']   = 'menuId';
+            if(empty($tableValidation)){
+                $response[$index]['message']  = 'Please enter valid table id.';
+                $response[$index]['fieldIndex'] = 0;
+                $response[$index]['fieldValue'] = 'tableId';
                 $index += 1;
                 $flag = 1;
+            }else{
+                if($tableOrderValidation){
+                    $response[$index]['message']  = 'Selected table already have an order.';
+                    $response[$index]['fieldIndex'] = 0;
+                    $response[$index]['fieldValue'] = 'tableId';
+                    $index += 1;
+                    $flag = 1;
+                }
             }
+        }
 
-            if(empty($value['quantity'])){
-                $response[$index]['message']  = 'The selected quantity is invalid.';
-                $response[$index]['arrayKey'] = $key;
-                $response[$index]['arrayValue']   = 'quantity';
-                $index += 1;
-                $flag = 1;
+        if(empty($data['menuData'])){
+            $response[$index]['message']  = 'Please enter menuData.';
+            $response[$index]['fieldIndex'] = 0;
+            $response[$index]['fieldValue'] = 'menuData';
+            $index += 1;
+            $flag = 1;
+        }else{
+            foreach($data['menuData'] as $key => $value){
+                $menu = Menu::find($value['menuId']);
+    
+                if(is_null($menu)){
+                    $response[$index]['message']  = 'The selected menuId is invalid.';
+                    $response[$index]['fieldIndex'] = $key;
+                    $response[$index]['fieldValue'] = 'menuId';
+                    $index += 1;
+                    $flag = 1;
+                }
+    
+                if(empty($value['quantity'])){
+                    $response[$index]['message']  = 'The selected quantity is invalid.';
+                    $response[$index]['fieldIndex'] = $key;
+                    $response[$index]['fieldValue'] = 'quantity';
+                    $index += 1;
+                    $flag = 1;
+                }
             }
         }
 
@@ -217,16 +230,11 @@ class ApiController extends BaseController
             ], $this->code);
         }
 
-        $existingOrder = Orders::where('table_id', $data['tableId'])->get('id')->toArray();
-
-        if($existingOrder){
-            $this->success  = false;
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => "Table order already exist. Please update.",
-                'data'      => $this->data
-            ], $this->code);
-        }
+        Table::where('id', $data['tableId'])
+                ->update([
+                            'status'     => 0,
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
 
         $order = [
             'table_id'  => $data['tableId']
