@@ -8,6 +8,7 @@ use App\Models\Table;
 use App\Models\Orders;
 use App\Models\Waiter;
 use App\Models\Category;
+use App\Models\DeviceToken;
 use Illuminate\Support\Str;
 use App\Models\OrderDetails;
 use Illuminate\Http\Request;
@@ -202,7 +203,7 @@ class ApiController extends BaseController
         }else{
             foreach($data['menuData'] as $key => $value){
                 $menu = Menu::find($value['menuId']);
-    
+
                 if(is_null($menu)){
                     $response[$index]['message']  = 'The selected menuId is invalid.';
                     $response[$index]['fieldIndex'] = $key;
@@ -210,7 +211,7 @@ class ApiController extends BaseController
                     $index += 1;
                     $flag = 1;
                 }
-    
+
                 if(empty($value['quantity'])){
                     $response[$index]['message']  = 'The selected quantity is invalid.';
                     $response[$index]['fieldIndex'] = $key;
@@ -516,7 +517,7 @@ class ApiController extends BaseController
     public function sendNotification(Request $request){
 
         // $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
-        $firebaseToken = "eZ89g9mESOuPd9jAKcBtAZ:APA91bGdqVWN1Ab-EuKtTTHdA6OBsEAP8mbBxEPCHehnlpRMUfsoGMOAGmxAHYpc69V_5rhoOJP4NMNf3BMKnBZljRfELjAFKf69NHtk09Csw49FD8bA8B07TKuJRKyEl220XGFF3VEw";
+        $firebaseToken = "i: enX10e-eSrC9ROTxCS27GX:APA91bE9PKx7E2Ohfi3fzAdKCF6PS8Qx8Ufo8m4keVQ9INi6g0TMxQRnWHxbwQVlXKPJNyV2CXugF-ztmxx-Ad1BY9aWH47cHyCV4r9mRLYyyUrxIaoQNnLoQhtbPupXNxd8teN8TBogi: enX10e-eSrC9ROTxCS27GX:APA91bE9PKx7E2Ohfi3fzAdKCF6PS8Qx8Ufo8m4keVQ9INi6g0TMxQRnWHxbwQVlXKPJNyV2CXugF-ztmxx-Ad1BY9aWH47cHyCV4r9mRLYyyUrxIaoQNnLoQhtbPupXNxd8teN8TBog";
         $SERVER_API_KEY = env('FCM_SERVER_KEY');
 
         $data = [
@@ -553,70 +554,72 @@ class ApiController extends BaseController
     public function waiterLogin(Request $request){
         $data       = json_decode($request->getContent(),true);
 
-        // $validator  = Validator::make($data, [
-        //     'email'   => 'required|email|exists:waiters,email',
-        //     'password'  => 'required'
-        // ]);
-
-        // //Send failed response if request is not valid
-        // if ($validator->fails()) {
-        //     $this->success  = false;
-        //     return response()->json([
-        //         'success'   => $this->success,
-        //         'message'   => $validator->messages(),
-        //         'data'      => $this->data
-        //     ], $this->code);
-        // }
-
-        $waiter = Waiter::where(['email' => $data['email'], 'password' => $data['password']])->first();
-
-        if($waiter){
-            do {
-                $token = Str::random(50);
-            } while (Waiter::where('remember_token', '=', $token)->first() instanceof Waiter);
-
-            Waiter::where('id', $waiter->id)
-                    ->update([
-                                'remember_token'    => $token,
-                                'updated_at'    => date('Y-m-d H:i:s')
-                            ]);
-
-            $this->data['token'] = $token;
-
+        if((empty($data['email'])) || (empty($data['password']))){
+            $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => 'Logged In successfully.',
-                'data'      => $this->data
-                ], $this->code);
-        }else{
-            return response()->json([
-                'success'   => $this->success,
-                'message'   => 'Please check password.',
-                'data'      => $this->data
-                ], $this->code);
+                'message'   => "Please enter valid mail and password"
+            ], $this->code);
         }
+
+        $waiter = Waiter::where('email', $data['email'])->first();
+
+        if(empty($waiter)){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "Invalid user"
+            ], $this->code);
+        }
+
+        if($waiter->password != $data['password']){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "Incorrect Password"
+            ], $this->code);
+        }
+
+        do {
+            $token = Str::random(50);
+        } while (Waiter::where('remember_token', '=', $token)->first() instanceof Waiter);
+
+        Waiter::where('id', $waiter->id)
+                ->update([
+                            'remember_token'    => $token,
+                            'updated_at'    => date('Y-m-d H:i:s')
+                        ]);
+
+        $this->data['token'] = $token;
+
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => 'Logged In successfully.',
+            'data'      => $this->data
+            ], $this->code);
     }
 
     public function orderCompletion(Request $request){
-        $data   = $request->only('orderId');
+        $data   = $request->only('tableId');
 
-        // $validator  = Validator::make($data, [
-        //     'orderId'   => 'required|exists:orders,id,deleted_at,NULL'
-        // ]);
+        $validator  = Validator::make($data, [
+            'tableId'   => 'required|exists:orders,table_id,deleted_at,NULL'
+            // 'orderId'   => 'required|exists:orders,id,deleted_at,NULL'
+        ]);
 
-        // //Send failed response if request is not valid
-        // if ($validator->fails()) {
-        //     $this->success  = false;
-        //     return response()->json([
-        //         'success'   => $this->success,
-        //         'message'   => $validator->messages(),
-        //         'data'      => $this->data
-        //     ], $this->code);
-        // }
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages(),
+                'data'      => $this->data
+            ], $this->code);
+        }
 
         $waiter = Waiter::where("remember_token", "=", $request->headers->get("Authorization"))->first();
 
-        $order = Orders::find($data['orderId']);
+        $order = Orders::where('table_id', $data['tableId'])->first();
 
         if($order->order_status == "Payment Done"){
             $this->success  = false;
@@ -640,7 +643,7 @@ class ApiController extends BaseController
             $order->save();
         }
 
-        $orderCompletion = Orders::where('orders.id', $data['orderId'])
+        $orderCompletion = Orders::where('orders.table_id', $data['tableId'])
                                     ->join('tables', 'tables.id', '=', 'orders.table_id')
                                     ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
                                     ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
@@ -648,7 +651,7 @@ class ApiController extends BaseController
                                     ->get()
                                     ->toArray();
 
-        $order_details = Orders::where('orders.id', $data['orderId'])
+        $order_details = Orders::where('orders.table_id', $data['tableId'])
                                     ->join('order_details', 'order_details.order_id', '=', 'orders.id')
                                     ->join('menus', 'menus.id', '=', 'order_details.menu_id')
                                     ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
@@ -666,8 +669,93 @@ class ApiController extends BaseController
             ], $this->code);
     }
 
-    public function deleteMenuItems(){
+    public function deleteMenuItems(Request $request){
+        $data   = $request->only('tableId', 'menuId');
 
+        $validator  = Validator::make($data, [
+            'tableId'   => 'required|exists:orders,table_id,deleted_at,NULL',
+            'menuId'   => 'required|exists:menus,id'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages()
+            ], $this->code);
+        }
+
+        $order = Orders::where('table_id', $data['tableId'])->first();
+        $orderDetails = OrderDetails::where(['order_id' => $order->id, 'menu_id' => $data['menuId']])->first();
+
+        if(empty($orderDetails)){
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "The selected menu is not ordered in the table"
+            ], $this->code);
+        }
+
+        $orderDetails->delete();
+
+        $totalAmount = 0;
+
+        $orderDetailsTotal = OrderDetails::where('order_id', $order->id)->get()->toArray();
+
+        foreach($orderDetailsTotal as $value){
+            $totalAmount += $value['menu_total_amount'];
+        }
+
+        Orders::where('id', $order->id)->update(['order_total_amount' => $totalAmount]);
+
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => "Menu item deleted Successfully"
+        ], $this->code);
+    }
+
+    public function deviceToken(Request $request){
+        
+        $data   = $request->only('deviceId', 'deviceToken');
+
+        $validator  = Validator::make($data, [
+            'deviceId'  => 'required',
+            'deviceToken'   => 'required'
+        ]);        
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => $validator->messages()
+            ], $this->code);
+        }
+
+        $presentDevice = DeviceToken::where('device_id', $data['deviceId'])->first();
+
+        if($presentDevice){
+            $presentDevice->device_token = $data['deviceToken'];
+            $presentDevice->save();
+
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "Device token updated"
+            ], $this->code);
+        }
+        
+        $value = [
+            'device_id' => $data['deviceId'],
+            'device_token'  => $data['deviceToken']
+        ];
+
+        DeviceToken::create($value);
+
+        return response()->json([
+            'success'   => $this->success,
+            'message'   => "Device token added"
+        ], $this->code);
     }
 
     public function test(){

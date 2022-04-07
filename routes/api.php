@@ -30,6 +30,7 @@ Route::get('/get-order', [ApiController::class, 'getOrder']);
 Route::post('/update-order', [ApiController::class, 'updateOrder']);
 Route::post('/delete-order', [ApiController::class, 'deleteOrder']);
 Route::get('/table-order', [ApiController::class, 'getTableOrder']);
+// Route::post('/device-token', [ApiController::class, 'deviceToken']);
 
 Route::post('/sendNotification', [ApiController::class, 'sendNotification']);
 Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
@@ -38,4 +39,5 @@ Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
 Route::middleware([verifyApiToken::class])->group(function () {
     Route::get('/test', [ApiController::class, 'test']);
     Route::get('/order-completion', [ApiController::class, 'orderCompletion']);
+    Route::post('/delete-menu', [ApiController::class, 'deleteMenuItems']);
 });
