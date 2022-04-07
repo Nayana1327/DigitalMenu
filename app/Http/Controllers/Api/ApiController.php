@@ -698,16 +698,25 @@ class ApiController extends BaseController
         }
 
         $orderDetails->delete();
-
+        
         $totalAmount = 0;
 
         $orderDetailsTotal = OrderDetails::where('order_id', $order->id)->get()->toArray();
 
-        foreach($orderDetailsTotal as $value){
-            $totalAmount += $value['menu_total_amount'];
-        }
-
-        Orders::where('id', $order->id)->update(['order_total_amount' => $totalAmount]);
+        if($orderDetailsTotal){
+            foreach($orderDetailsTotal as $value){
+                $totalAmount += $value['menu_total_amount'];
+            }
+    
+            Orders::where('id', $order->id)->update(['order_total_amount' => $totalAmount]);
+        } else {
+            Orders::where('id', $order->id)
+                    ->update([
+                                'order_total_amount' => "0.00",
+                                'order_status'  => 'Order Cancelled',
+                                'deleted_at'    => date('Y-m-d H:i:s')
+                            ]);
+        }        
 
         return response()->json([
             'success'   => $this->success,
