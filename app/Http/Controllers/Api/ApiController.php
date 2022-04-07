@@ -569,7 +569,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "Invalid user"
-            ], $this->code);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         if($waiter->password != $data['password']){
@@ -698,7 +698,7 @@ class ApiController extends BaseController
         }
 
         $orderDetails->delete();
-        
+
         $totalAmount = 0;
 
         $orderDetailsTotal = OrderDetails::where('order_id', $order->id)->get()->toArray();
