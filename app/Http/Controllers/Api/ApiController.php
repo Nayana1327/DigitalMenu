@@ -19,10 +19,12 @@ class ApiController extends BaseController
 {
     public function __construct()
     {
-        // $this->user     = JWTAuth::parseToken()->authenticate();
-        $this->data     = [];
-        $this->code     = Response::HTTP_OK;
         $this->success  = true;
+        $this->code['http_ok']              = Response::HTTP_OK;
+        $this->code['http_created']         = Response::HTTP_CREATED;
+        $this->code['http_unauthorized']    = Response::HTTP_UNAUTHORIZED;
+        $this->code['http_not_found']       = Response::HTTP_NOT_FOUND;
+        $this->data     = NULL;
         $this->message  = '';
     }
 
@@ -35,17 +37,17 @@ class ApiController extends BaseController
             $this->data = $categories;
             //return success response
             return response()->json([
-                'success'   => $this->success,
-                'message'   => 'Categories fetched successfully',
-                'data'      => $this->data
-            ], $this->code);
+                'success'       => $this->success,
+                'message'       => 'Categories fetched successfully',
+                'successData'   => $this->data
+            ], $this->code['http_created']);
         }
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
             'message'   => 'No Category Found',
-            'data'      => $this->data
-        ], $this->code);
+            'errorData' => $this->data
+        ], $this->code['http_not_found']);
     }
 
     //Menu Listing Api
@@ -60,15 +62,15 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => 'Menus fetched successfully',
-                'data'      => $this->data
-            ], $this->code);
+                'successData'      => $this->data
+            ], $this->code['http_created']);
         }
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
             'message'   => 'No Menu Found',
-            'data'      => $this->data
-        ], $this->code);
+            'errorData'      => $this->data
+        ], $this->code['http_not_found']);
     }
 
     //Available Table Listing Api
@@ -84,15 +86,15 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => 'Tables fetched successfully',
-                'data'      => $this->data
-            ], $this->code);
+                'successData'      => $this->data
+            ], $this->code['http_created']);
         }
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
             'message'   => 'No Table Available',
-            'data'      => $this->data
-        ], $this->code);
+            'errorData'      => $this->data
+        ], $this->code['http_not_found']);
     }
 
 
@@ -151,15 +153,15 @@ class ApiController extends BaseController
         return response()->json([
         'success'   => $this->success,
         'message'   => 'Menus fetched successfully',
-        'data'      => $this->data
-        ], $this->code);
+        'successData'      => $this->data
+        ], $this->code['http_created']);
     }
         $this->success  = false;
         return response()->json([
         'success'   => $this->success,
         'message'   => 'No search found',
-        'data'      => $this->data
-        ], $this->code);
+        'errorData'      => $this->data
+        ], $this->code['http_not_found']);
     }
 
     public function insertOrder(Request $request){
@@ -226,9 +228,10 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => 'Validation Error',
+                'message'   => 'Some error occured with the given order details.',
                 'errorData' => $response
-            ], $this->code);
+            ], 
+            $this->code['http_not_found']);
         }
 
         Table::where('id', $data['tableId'])
@@ -265,16 +268,16 @@ class ApiController extends BaseController
 
         Orders::where('id', $order_insert->id)->update(['order_total_amount' => $order_total_amount]);
 
-        $this->data = [
-                'OrderId'   => $order_insert->id
-            ];
+        // $this->data = [
+        //         'OrderId'   => $order_insert->id
+        //     ];
 
         //order created, return success response
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Order created successfully',
-            'data'      => $this->data
-        ], $this->code);
+            'message'   => 'Order has been placed',
+            'successData'      => $this->data
+        ], $this->code['http_ok']);
     }
 
     public function getOrder(Request $request){
@@ -463,22 +466,23 @@ class ApiController extends BaseController
             'data'      => $this->data
         ], $this->code);
     }
+
     public function getTableOrder(Request $request){
         $data   = $request->only('tableId');
 
-        // $validator  = Validator::make($data, [
-        //     'tableId'   => 'required|exists:orders,table_id'
-        // ]);
+        $validator  = Validator::make($data, [
+            'tableId'   => 'required|exists:orders,table_id'
+        ]);
 
-        // //Send failed response if request is not valid
-        // if ($validator->fails()) {
-        //     $this->success  = false;
-        //     return response()->json([
-        //         'success'   => $this->success,
-        //         'message'   => "No Order's Placed",
-        //         'data'      => NULL
-        //     ], $this->code);
-        // }
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            $this->success  = false;
+            return response()->json([
+                'success'   => $this->success,
+                'message'   => "No order has been placed in the table",
+                'errorData' => $this->data
+            ], $this->code['http_not_found']);
+        }
 
         $order = Orders::where('orders.table_id', $request->tableId)
                     ->join('tables', 'tables.id', '=', 'orders.table_id')
@@ -494,24 +498,24 @@ class ApiController extends BaseController
                             ->get()
                             ->toArray();
 
-        if($order){
+        if($order_details){
             $this->data['order'] = $order[0];
             $this->data['order']['orderDetails'] = $order_details;
 
             //order fetched, return success response
             return response()->json([
-                'success'   => $this->success,
-                'message'   => 'Order fetched successfully',
-                'data'      => $this->data
-                ], $this->code);
+                'success'       => $this->success,
+                'message'       => 'Order fetched successfully',
+                'successData'   => $this->data
+                ], $this->code['http_created']);
         }
 
         $this->success  = false;
         return response()->json([
             'success'   => $this->success,
             'message'   => "No orders found",
-            'data'      => NULL
-        ], $this->code);
+            'errorData' => $this->data
+        ], $this->code['http_not_found']);
     }
 
     public function sendNotification(Request $request){
@@ -558,8 +562,9 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => "Please enter valid mail and password"
-            ], $this->code);
+                'message'   => "Please enter valid mail id and password.",
+                'errorData' => $this->data
+            ], $this->code['http_not_found']);
         }
 
         $waiter = Waiter::where('email', $data['email'])->first();
@@ -568,16 +573,18 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => "Invalid user"
-            ], Response::HTTP_UNAUTHORIZED);
+                'message'   => "This user is not rgeistered.",
+                'errorData' => $this->data
+            ], $this->code['http_unauthorized']);
         }
 
         if($waiter->password != $data['password']){
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => "Incorrect Password"
-            ], $this->code);
+                'message'   => "The entered password is incorrect",
+                'errorData' => $this->data
+            ], $this->code['http_unauthorized']);
         }
 
         do {
@@ -595,8 +602,8 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => 'Logged In successfully.',
-            'data'      => $this->data
-            ], $this->code);
+            'successData'      => $this->data
+            ], $this->code['http_created']);
     }
 
     public function orderCompletion(Request $request){
@@ -612,9 +619,9 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => $validator->messages(),
-                'data'      => $this->data
-            ], $this->code);
+                'message'   => "Some error occured while completeing the order.",
+                'errorData' => $validator->messages()
+            ], $this->code['http_not_found']);
         }
 
         $waiter = Waiter::where("remember_token", "=", $request->headers->get("Authorization"))->first();
@@ -626,15 +633,15 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "This order already completed and the payment is done",
-                'data'      => $this->data
-            ], $this->code);
+                'errorData'      => $this->data
+            ], $this->code['http_not_found']);
         }elseif($order->order_status == "Order Cancelled"){
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "This order has been cancelled already",
-                'data'      => $this->data
-            ], $this->code);
+                'errorData'      => $this->data
+            ], $this->code['http_not_found']);
         }else{
             Table::where('id', $order->table_id )->update(['status' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
             $order->waiter_id = $waiter->id;
@@ -659,14 +666,14 @@ class ApiController extends BaseController
                                     ->get()
                                     ->toArray();
 
-        $this->data['order'] = $orderCompletion[0];
-        $this->data['order']['orderDetails'] = $order_details;
+        // $this->data['order'] = $orderCompletion[0];
+        // $this->data['order']['orderDetails'] = $order_details;
 
         return response()->json([
             'success'   => $this->success,
-            'message'   => 'Order Completed',
-            'data'      => $this->data
-            ], $this->code);
+            'message'   => 'Order has been completed.',
+            'successData'      => $this->data
+            ], $this->code['http_ok']);
     }
 
     public function deleteMenuItems(Request $request){
@@ -682,8 +689,9 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => $validator->messages()
-            ], $this->code);
+                'message'   => "Some error occured while deleting menu items from the order.",
+                'errorData'      => $validator->messages()
+            ], $this->code['http_not_found']);
         }
 
         $order = Orders::where('table_id', $data['tableId'])->first();
@@ -693,8 +701,9 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => "The selected menu is not ordered in the table"
-            ], $this->code);
+                'message'   => "The selected menu is not ordered in the table",
+                'errorData'      => $this->data
+            ], $this->code['http_not_found']);
         }
 
         $orderDetails->delete();
@@ -707,7 +716,7 @@ class ApiController extends BaseController
             foreach($orderDetailsTotal as $value){
                 $totalAmount += $value['menu_total_amount'];
             }
-    
+
             Orders::where('id', $order->id)->update(['order_total_amount' => $totalAmount]);
         } else {
             Orders::where('id', $order->id)
@@ -716,30 +725,32 @@ class ApiController extends BaseController
                                 'order_status'  => 'Order Cancelled',
                                 'deleted_at'    => date('Y-m-d H:i:s')
                             ]);
-        }        
+        }
 
         return response()->json([
             'success'   => $this->success,
-            'message'   => "Menu item deleted Successfully"
-        ], $this->code);
+            'message'   => "Menu item deleted.",
+            'successData'   => $this->data
+        ], $this->code['http_ok']);
     }
 
     public function deviceToken(Request $request){
-        
+
         $data   = $request->only('deviceId', 'deviceToken');
 
         $validator  = Validator::make($data, [
             'deviceId'  => 'required',
             'deviceToken'   => 'required'
-        ]);        
+        ]);
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => $validator->messages()
-            ], $this->code);
+                'message'   => "Some error occured while adding new device.",
+                'errorData'   => $validator->messages()
+            ], $this->code['http_not_found']);
         }
 
         $presentDevice = DeviceToken::where('device_id', $data['deviceId'])->first();
@@ -750,10 +761,11 @@ class ApiController extends BaseController
 
             return response()->json([
                 'success'   => $this->success,
-                'message'   => "Device token updated"
-            ], $this->code);
+                'message'   => "Device token has been updated",
+                'successData'   => $this->data
+            ], $this->code['http_ok']);
         }
-        
+
         $value = [
             'device_id' => $data['deviceId'],
             'device_token'  => $data['deviceToken']
@@ -763,8 +775,9 @@ class ApiController extends BaseController
 
         return response()->json([
             'success'   => $this->success,
-            'message'   => "Device token added"
-        ], $this->code);
+            'message'   => "Device token has been added",
+            'successData'   => $this->data
+        ], $this->code['http_ok']);
     }
 
     public function test(){

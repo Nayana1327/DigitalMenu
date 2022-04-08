@@ -30,7 +30,7 @@ Route::get('/get-order', [ApiController::class, 'getOrder']);
 Route::post('/update-order', [ApiController::class, 'updateOrder']);
 Route::post('/delete-order', [ApiController::class, 'deleteOrder']);
 Route::get('/table-order', [ApiController::class, 'getTableOrder']);
-// Route::post('/device-token', [ApiController::class, 'deviceToken']);
+Route::post('/device-token', [ApiController::class, 'deviceToken']);
 
 Route::post('/sendNotification', [ApiController::class, 'sendNotification']);
 Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
