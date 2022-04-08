@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class verifyApiToken
 {
     /**
-     * Handle an incoming request.
+     * Handle an incoming request to check wheather is logged in or not.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
@@ -22,7 +22,7 @@ class verifyApiToken
             return response()->json([
                 'success'   => false,
                 'message'   => "Please log in to proceed",
-                'errorData'   => NULL
+                'errorData' => NULL
             ], Response::HTTP_UNAUTHORIZED);
             die();
         }
@@ -32,7 +32,7 @@ class verifyApiToken
             return response()->json([
                 'success'   => false,
                 'message'   => "Please log in to proceed",
-                'errorData'   => NULL
+                'errorData' => NULL
             ], Response::HTTP_UNAUTHORIZED);
             die();
         }

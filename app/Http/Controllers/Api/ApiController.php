@@ -518,17 +518,14 @@ class ApiController extends BaseController
         ], $this->code['http_not_found']);
     }
 
-    public function sendNotification(Request $request){
-
-        // $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
-        $firebaseToken = "i: enX10e-eSrC9ROTxCS27GX:APA91bE9PKx7E2Ohfi3fzAdKCF6PS8Qx8Ufo8m4keVQ9INi6g0TMxQRnWHxbwQVlXKPJNyV2CXugF-ztmxx-Ad1BY9aWH47cHyCV4r9mRLYyyUrxIaoQNnLoQhtbPupXNxd8teN8TBogi: enX10e-eSrC9ROTxCS27GX:APA91bE9PKx7E2Ohfi3fzAdKCF6PS8Qx8Ufo8m4keVQ9INi6g0TMxQRnWHxbwQVlXKPJNyV2CXugF-ztmxx-Ad1BY9aWH47cHyCV4r9mRLYyyUrxIaoQNnLoQhtbPupXNxd8teN8TBog";
+    public function sendNotification($title, $body, $deviceToken){
         $SERVER_API_KEY = env('FCM_SERVER_KEY');
 
         $data = [
-            "registration_ids" => array($firebaseToken),
+            "registration_ids" => $deviceToken,
             "notification" => [
-                "title" => "Test",
-                "body" => "Firebase Notification Testing",
+                "title" => $title,
+                "body" => $body
             ]
         ];
 
@@ -548,11 +545,7 @@ class ApiController extends BaseController
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
         $response = curl_exec($ch);
 
-        return response()->json([
-            'success'   => $this->success,
-            'message'   => 'Notification send successfully.',
-            'data'      => $response
-            ], $this->code);
+        return $response;
     }
 
     public function waiterLogin(Request $request){
@@ -648,23 +641,31 @@ class ApiController extends BaseController
             $order->order_status = "Payment Done";
             $order->deleted_at = date('Y-m-d H:i:s');
             $order->save();
-        }
+        }        
 
-        $orderCompletion = Orders::where('orders.table_id', $data['tableId'])
-                                    ->join('tables', 'tables.id', '=', 'orders.table_id')
-                                    ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
-                                    ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
-                                    ->withTrashed()
-                                    ->get()
-                                    ->toArray();
+        $tableNo        = Table::where('id', $data['tableId'])->first();
+        $deviceToken    = DeviceToken::select('device_token')->get()->toArray();
 
-        $order_details = Orders::where('orders.table_id', $data['tableId'])
-                                    ->join('order_details', 'order_details.order_id', '=', 'orders.id')
-                                    ->join('menus', 'menus.id', '=', 'order_details.menu_id')
-                                    ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
-                                    ->withTrashed()
-                                    ->get()
-                                    ->toArray();
+        $title  = "Order Completed";
+        $body   = "The order in ". $tableNo->table_no ."has been completed"; 
+        
+        $this->sendNotification($title, $body, $deviceToken);
+
+        // $orderCompletion = Orders::where('orders.table_id', $data['tableId'])
+        //                             ->join('tables', 'tables.id', '=', 'orders.table_id')
+        //                             ->leftjoin('waiters', 'waiters.id', '=', 'orders.waiter_id')
+        //                             ->select('orders.id AS OrderId', 'tables.id AS tableID', 'tables.table_no AS tableNo', 'tables.table_name AS tableName', 'waiters.waiter_name AS waiterName', 'orders.order_status AS orderStatus', 'orders.order_total_amount AS orderTotalAmount')
+        //                             ->withTrashed()
+        //                             ->get()
+        //                             ->toArray();
+
+        // $order_details = Orders::where('orders.table_id', $data['tableId'])
+        //                             ->join('order_details', 'order_details.order_id', '=', 'orders.id')
+        //                             ->join('menus', 'menus.id', '=', 'order_details.menu_id')
+        //                             ->select('menus.id AS menuId', 'menus.menu_name AS menuName', 'menus.menu_price AS menuPrice', 'menus.sub_category AS subCategory', 'order_details.quantity AS quantity', 'order_details.menu_total_amount AS menuTotalAmount')
+        //                             ->withTrashed()
+        //                             ->get()
+        //                             ->toArray();
 
         // $this->data['order'] = $orderCompletion[0];
         // $this->data['order']['orderDetails'] = $order_details;
