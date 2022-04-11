@@ -105,11 +105,11 @@
         ajax: "{{ route('order-list') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-            {data: 'order_no', name: 'order_no'},
-            {data: 'table_no', name: 'table_no'},
-            {data: 'ordered_on', name: 'ordered_on'},
-            {data: 'ordered_by', name: 'ordered_by'},
-            {data: 'food_ordered', name: 'food_ordered'},
+            //{data: 'order_no', name: 'order_no'},
+            //{data: 'table_no', name: 'table_no'},
+            //{data: 'ordered_on', name: 'ordered_on'},
+            //{data: 'ordered_by', name: 'ordered_by'},
+            //{data: 'food_ordered', name: 'food_ordered'},
             {data: 'total_amount', name: 'total_amount'},
             {data: 'status', name: 'status'}
         ]

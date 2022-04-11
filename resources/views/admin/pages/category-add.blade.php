@@ -20,10 +20,10 @@
         @if(Session::has('message'))
         <div class="pad margin no-print">
             <div class="callout {{ Session::get('callout-class', 'callout-success') }}" style="margin-bottom: 0!important;">
-                {{ Session::get('message') }}  
+                {{ Session::get('message') }}
             </div>
         </div>
-        @endif  
+        @endif
       </div><!-- /.container-fluid -->
     </section>
 
@@ -53,6 +53,22 @@
                                             @if ($errors->has('category_name'))
                                             <span class="help-block">
                                                 <strong class="error-text">{{ $errors->first('category_name') }}</strong>
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Image</label>
+                                            <input type="file" name="category_file_name" id="category_file_name" class="form-control" placeholder="Choose Image" accept="image/png, image/jpeg, image/jpg" autocomplete="off">
+                                            <p class='category_no_image'>No image found</p>
+                                            <button type="button" class="close file_clear" style="display:none;" id="category_image_clear">
+                                            <span>&times;</span>
+                                            </button>
+                                            <img width="150" height="100" class='category_selected_image' style='display:none;' src="#"  />
+                                            @if ($errors->has('category_file_name'))
+                                            <span class="help-block">
+                                                <strong class="error-text">{{ $errors->first('category_file_name') }}</strong>
                                             </span>
                                             @endif
                                         </div>
@@ -89,7 +105,7 @@
 
     $(function () {
         $('#new_category_add').validate({
-            ignore: ":hidden", 
+            ignore: ":hidden",
             ignore: "",
             rules: {
                 category_name: {
@@ -109,12 +125,35 @@
                 $(element).removeClass('is-invalid');
             }
         });
-        
+
+    });
+    $("#category_file_name").change(function() {
+        displayPlainLogoSelectedImage(this);
+    });
+    function displayPlainLogoSelectedImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+            $('.category_selected_image').show();
+            $('#category_image_clear').show();
+            $('.category_no_image').hide();
+            $('.category_selected_image').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#category_image_clear").on("click", function () {
+        $("#category_file_name").val(null);
+        $('.category_selected_image').hide();
+        $('#category_image_clear').hide();
+        $('.category_no_image').show();
+        $(".category_selected_image").val(null);
     });
     $('#new_category_add_form_cancel').click(function(){
         window.location.href="{{ route('category-list') }}";
     })
-    
+
 </script>
 
 @endsection

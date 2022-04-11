@@ -49,6 +49,7 @@
                                       <tr>
                                           <th>S. No.</th>
                                           <th>Category Name</th>
+                                          <th>Image</th>
                                           <th></th>
                                       </tr>
                                   </thead>
@@ -102,6 +103,7 @@
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'category_name', name: 'category_name'},
+            {data: 'category_image', name: 'category_image'},
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ]
     });

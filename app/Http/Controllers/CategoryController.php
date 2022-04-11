@@ -25,11 +25,16 @@ class CategoryController extends Controller
             $data   = Category::all();
             return DataTables::of($data)
                     ->addIndexColumn()
+                    ->addColumn('category_image', function ($data){
+                        $url=asset("storage/category_images/$data->category_image");
+                        return '<img src='.$url.' border="0" height="100" width="100" class="img-rounded" align="center" />';
+                    })
                     ->addColumn('action',function ($data){
                         $b_url = \URL::to('/');
                         return 
                         "<button onclick=deleteCategory(".$data->id.") class='btn btn-xs btn-danger'><i class='fas fa-trash'></i></button>";
                     })
+                    ->rawColumns(['category_image','action'])
                     ->make(true);
         }
         return view('admin.pages.category-list');
@@ -42,12 +47,29 @@ class CategoryController extends Controller
 
     public function categoryAdd(Request $request){
         $rules = [
-			'category_name' => 'required|string|max:255'
+			'category_name'         => 'required|string|max:255',
+            'category_file_name'    => 'required|image|mimes:jpeg,png,jpg,gif,svg'
 		];
         $this->validate($request, $rules);
+        $time = time();
+        //1.get file name wth ext.
+        $fileNameWithExt = $request->file('category_file_name')->getClientOriginalName();
+        //2.get just file name
+        $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        //1.get just ext.
+        $extension = $request->file('category_file_name')->getClientOriginalExtension();
+        //4.file name to store
+        $fileNameToStore = $time.'.'.$extension;
+
+        //upload image
+        $path = $request->file('category_file_name')->storeAs('category_images', $fileNameToStore);
+
+        // $imageName = 'public/menu_item_images/'.$request->menu_name.'_'.time().'.'.$extension.'';
+
         $category_details = [
-            'category_name' => $request->category_name,
-            'created_at' => date('Y-m-d H:i:s'),
+            'category_name'     => $request->category_name,
+            'category_image'    => $fileNameToStore,
+            'created_at'        => date('Y-m-d H:i:s'),
         ];
         $is_inserted = Category::insert($category_details);
         if($is_inserted)
