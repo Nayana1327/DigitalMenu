@@ -37,9 +37,9 @@ class ApiController extends BaseController
             $this->data = $categories;
             //return success response
             return response()->json([
-                'success'       => $this->success,
-                'message'       => 'Categories fetched successfully',
-                'successData'   => $this->data
+                'success'   => $this->success,
+                'message'   => 'Categories fetched successfully',
+                'data'      => $this->data
             ], $this->code['http_created']);
         }
         $this->success  = false;
@@ -62,7 +62,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => 'Menus fetched successfully',
-                'successData'      => $this->data
+                'data'      => $this->data
             ], $this->code['http_created']);
         }
         $this->success  = false;
@@ -86,7 +86,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => 'Tables fetched successfully',
-                'successData'      => $this->data
+                'data'      => $this->data
             ], $this->code['http_created']);
         }
         $this->success  = false;
@@ -153,7 +153,7 @@ class ApiController extends BaseController
         return response()->json([
         'success'   => $this->success,
         'message'   => 'Menus fetched successfully',
-        'successData'      => $this->data
+        'data'      => $this->data
         ], $this->code['http_created']);
     }
         $this->success  = false;
@@ -276,7 +276,7 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => 'Order has been placed',
-            'successData'      => $this->data
+            'data'      => $this->data
         ], $this->code['http_ok']);
     }
 
@@ -506,7 +506,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'       => $this->success,
                 'message'       => 'Order fetched successfully',
-                'successData'   => $this->data
+                'data'          => $this->data
                 ], $this->code['http_created']);
         }
 
@@ -595,7 +595,7 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => 'Logged In successfully.',
-            'successData'      => $this->data
+            'data'      => $this->data
             ], $this->code['http_created']);
     }
 
@@ -673,7 +673,7 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => 'Order has been completed.',
-            'successData'      => $this->data
+            'data'      => $this->data
             ], $this->code['http_ok']);
     }
 
@@ -731,7 +731,7 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => "Menu item deleted.",
-            'successData'   => $this->data
+            'data'      => $this->data
         ], $this->code['http_ok']);
     }
 
@@ -763,7 +763,7 @@ class ApiController extends BaseController
             return response()->json([
                 'success'   => $this->success,
                 'message'   => "Device token has been updated",
-                'successData'   => $this->data
+                'data'      => $this->data
             ], $this->code['http_ok']);
         }
 
@@ -777,7 +777,7 @@ class ApiController extends BaseController
         return response()->json([
             'success'   => $this->success,
             'message'   => "Device token has been added",
-            'successData'   => $this->data
+            'data'      => $this->data
         ], $this->code['http_ok']);
     }
 
