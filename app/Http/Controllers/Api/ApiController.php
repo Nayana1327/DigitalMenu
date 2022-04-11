@@ -644,7 +644,7 @@ class ApiController extends BaseController
         }        
 
         $tableNo        = Table::where('id', $data['tableId'])->first();
-        $deviceToken    = DeviceToken::select('device_token')->get()->toArray();
+        $deviceToken    = DeviceToken::pluck('device_token');
 
         $title  = "Order Completed";
         $body   = "The order in ". $tableNo->table_no ."has been completed"; 
