@@ -30,8 +30,12 @@ class ApiController extends BaseController
 
     //Category Listing Api
     public function listCategories(){
-       $categories = Category::select('id as categoryId','category_name as categoryName')
+       $categories = Category::select('id as categoryId','category_name as categoryName', 'category_image as categoryImage')
                      ->get()->toArray();
+
+        foreach($categories as $key => $value){
+            $categories[$key]['categoryImage'] = asset('storage/category_images/' . $value['categoryImage']);
+        }
 
         if($categories){
             $this->data = $categories;
@@ -230,7 +234,7 @@ class ApiController extends BaseController
                 'success'   => $this->success,
                 'message'   => 'Some error occured with the given order details.',
                 'errorData' => $response
-            ], 
+            ],
             $this->code['http_not_found']);
         }
 
@@ -641,14 +645,14 @@ class ApiController extends BaseController
             $order->order_status = "Payment Done";
             $order->deleted_at = date('Y-m-d H:i:s');
             $order->save();
-        }        
+        }
 
         $tableNo        = Table::where('id', $data['tableId'])->first();
         $deviceToken    = DeviceToken::pluck('device_token');
 
         $title  = "Order Completed";
-        $body   = "The order in ". $tableNo->table_no ."has been completed"; 
-        
+        $body   = "The order in ". $tableNo->table_no ."has been completed";
+
         $this->sendNotification($title, $body, $deviceToken);
 
         // $orderCompletion = Orders::where('orders.table_id', $data['tableId'])
