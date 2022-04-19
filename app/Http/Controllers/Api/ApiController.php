@@ -128,7 +128,7 @@ class ApiController extends BaseController
 
     //Menu Listing Api By (CategoryName, Veg/Non-Veg, Search)
     public function searchByMenu(Request $request){
-        $categoryName = $request->categoryName;
+        $categoryName = ($request->categoryName == 'All Categories') ? null : $request->categoryName;
         $subCategory = $request->subCategory;
         $searchValue = $request->searchValue;
         $menus = Menu::select('id as menuId','menu_name as menuName','menu_description as menuDescription','menu_category as menuCategory','menu_cuisine as menuCuisine','menu_portion as menuPortion','menu_price as menuPrice','menu_image as menuImage','sub_category as subCategory')
