@@ -20,10 +20,10 @@
         @if(Session::has('message'))
         <div class="pad margin no-print">
             <div class="callout {{ Session::get('callout-class', 'callout-success') }}" style="margin-bottom: 0!important;">
-                {{ Session::get('message') }}  
+                {{ Session::get('message') }}
             </div>
         </div>
-        @endif 
+        @endif
       </div><!-- /.container-fluid -->
     </section>
 
@@ -110,8 +110,8 @@
             //{data: 'ordered_on', name: 'ordered_on'},
             //{data: 'ordered_by', name: 'ordered_by'},
             //{data: 'food_ordered', name: 'food_ordered'},
-            {data: 'total_amount', name: 'total_amount'},
-            {data: 'status', name: 'status'}
+            {data: 'order_total_amount', name: 'order_total_amount'},
+            {data: 'order_status', name: 'order_status'}
         ]
     });
   });

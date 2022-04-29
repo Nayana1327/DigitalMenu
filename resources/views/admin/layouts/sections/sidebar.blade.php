@@ -8,7 +8,7 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-      
+
     <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -88,26 +88,25 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item">
+          {{--  <li class="nav-item">
             <a href="/order-list" class="nav-link {{ (Route::is('order-list') || Route::is('')) ? 'active' : '' }}">
               <p>
                Orders
                 <i class="right fas fa-angle-right"></i>
               </p>
             </a>
-          </li>
-          <li class="nav-item">
+          </li>  --}}
+          {{--  <li class="nav-item">
             <a href="/reports" class="nav-link {{ (Route::is('reports') || Route::is('export_report')) ? 'active' : '' }}">
               <p>
                Reports
                 <i class="right fas fa-angle-right"></i>
               </p>
             </a>
-          </li>
+          </li>  --}}
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
   </aside>
-  
