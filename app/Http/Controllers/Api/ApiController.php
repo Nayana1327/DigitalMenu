@@ -165,7 +165,7 @@ class ApiController extends BaseController
         'success'   => $this->success,
         'message'   => 'No search found',
         'errorData'      => $this->data
-        ], $this->code['http_not_found']);
+        ], $this->code['http_ok']);
     }
 
     public function insertOrder(Request $request){
