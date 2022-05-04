@@ -678,8 +678,6 @@ class ApiController extends BaseController
         curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
         $response = curl_exec($ch);
 
-        dd($response);
-
         return $response;
     }
 

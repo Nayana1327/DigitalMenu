@@ -38,6 +38,6 @@ Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
 
 Route::middleware([verifyApiToken::class])->group(function () {
     Route::get('/test', [ApiController::class, 'test']);
-    Route::get('/order-completion', [ApiController::class, 'orderCompletion']);
+    Route::post('/order-completion', [ApiController::class, 'orderCompletion']);
     Route::post('/delete-menu', [ApiController::class, 'deleteMenuItems']);
 });
