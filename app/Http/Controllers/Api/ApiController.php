@@ -522,36 +522,6 @@ class ApiController extends BaseController
         ], $this->code['http_not_found']);
     }
 
-    public function sendNotification($title, $body, $deviceToken){
-        $SERVER_API_KEY = env('FCM_SERVER_KEY');
-
-        $data = [
-            "registration_ids" => $deviceToken,
-            "notification" => [
-                "title" => $title,
-                "body" => $body
-            ]
-        ];
-
-        $dataString = json_encode($data);
-
-        $headers = [
-            'Authorization: key=' . $SERVER_API_KEY,
-            'Content-Type: application/json',
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-        $response = curl_exec($ch);
-
-        return $response;
-    }
-
     public function waiterLogin(Request $request){
         $data       = json_decode($request->getContent(),true);
 
@@ -679,6 +649,38 @@ class ApiController extends BaseController
             'message'   => 'Order has been completed.',
             'data'      => $this->data
             ], $this->code['http_ok']);
+    }
+
+    public function sendNotification($title, $body, $deviceToken){
+        $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+        $data = [
+            "registration_ids" => $deviceToken,
+            "notification" => [
+                "title" => $title,
+                "body" => $body
+            ]
+        ];
+
+        $dataString = json_encode($data);
+
+        $headers = [
+            'Authorization: key=' . $SERVER_API_KEY,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+        $response = curl_exec($ch);
+
+        dd($response);
+
+        return $response;
     }
 
     public function deleteMenuItems(Request $request){
