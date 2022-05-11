@@ -232,7 +232,7 @@ class ApiController extends BaseController
             $this->success  = false;
             return response()->json([
                 'success'   => $this->success,
-                'message'   => 'Some error occured with the given order details.',
+                'message'   => 'Order cant be placed with this table.',
                 'errorData' => $response
             ],
             $this->code['http_not_found']);
