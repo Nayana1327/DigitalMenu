@@ -621,7 +621,7 @@ class ApiController extends BaseController
         $deviceToken    = DeviceToken::pluck('device_token');
 
         $title  = "Order Completed";
-        $body   = "The order in ". $tableNo->table_no ."has been completed";
+        $body   = "The order placed in Table ". $tableNo->table_no." is complete";
 
         $this->sendNotification($title, $body, $deviceToken);
 
