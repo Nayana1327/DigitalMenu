@@ -14,6 +14,7 @@ use App\Models\OrderDetails;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Controllers\Api\BaseController as BaseController;
+use App\Models\Rider;
 
 class ApiController extends BaseController
 {
