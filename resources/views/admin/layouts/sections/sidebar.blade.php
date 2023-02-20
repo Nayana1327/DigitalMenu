@@ -66,6 +66,14 @@
               </p>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="/rider-list" class="nav-link {{ (Route::is('rider-list') || Route::is('rider-add')) ? 'active' : '' }}">
+              <p>
+              Delivery Person
+                <i class="right fas fa-angle-right"></i>
+              </p>
+            </a>
+          </li>
           <li class="nav-item {{ (Route::is('table-list') || Route::is('table-add')  || Route::is('table-availability')) ? 'menu-is-opening menu-open' : '' }}">
             <a href="#" class="nav-link {{ (Route::is('table-list') || Route::is('table-add') || Route::is('table-availability')) ? 'active' : '' }}">
               <p>

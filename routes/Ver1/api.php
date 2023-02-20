@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\TableController;
 use App\Http\Controllers\Api\V1\WaiterController;
 use App\Http\Controllers\Api\V1\DeviceController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\RiderController;
 /*
 |--------------------------------------------------------------------------
 | Version 1 API Routes
@@ -32,6 +33,8 @@ Route::post('/insert-order', [OrderController::class, 'store']);
 Route::get('/get-order', [OrderController::class, 'getOrder']);
 
 Route::post('/waiter-login', [WaiterController::class, 'login']);
+
+Route::post('/rider-login', [RiderController::class, 'login']);
 
 Route::post('/device-token', [DeviceController::class, 'store']);
 // Route::get('/truncate', [DeviceController::class, 'truncate']);

@@ -34,6 +34,7 @@ Route::post('/device-token', [ApiController::class, 'deviceToken']);
 
 Route::post('/sendNotification', [ApiController::class, 'sendNotification']);
 Route::post('/waiter-login', [ApiController::class, 'waiterLogin']);
+Route::post('/rider-login', [ApiController::class, 'Riderlogin']);
 
 
 Route::middleware([verifyApiToken::class])->group(function () {

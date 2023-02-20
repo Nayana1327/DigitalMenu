@@ -9,7 +9,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TableController;
-
+use App\Http\Controllers\RiderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +67,12 @@ Route::get('/waiter-list', [WaiterController::class, 'waiterList'])->name('waite
 Route::get('/waiter-add', [WaiterController::class, 'waiterAddView'])->name('waiter-add');
 Route::post('/waiter-add', [WaiterController::class, 'waiterAdd'])->name('waiter-insert');
 Route::post('/waiter-delete', [WaiterController::class, 'waiterDelete'])->name('waiter-delete');
+
+//Delivery Persons
+Route::get('/rider-list', [RiderController::class, 'riderList'])->name('rider-list');
+Route::get('/rider-add', [RiderController::class, 'riderAddView'])->name('rider-add');
+Route::post('/rider-add', [RiderController::class, 'riderAdd'])->name('rider-insert');
+Route::post('/rider-delete', [RiderController::class, 'riderDelete'])->name('rider-delete');
 
 //Tables
 Route::get('/table-list', [TableController::class, 'tableList'])->name('table-list');
